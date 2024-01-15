@@ -23,6 +23,7 @@ public class GenerateMap : MonoBehaviour
     public GameObject player;
 
     private List<Chunk> map = new List<Chunk>();
+    private List<Chunk> activeMap = new List<Chunk>();
     private Vector2 currentChunk = new Vector2();
     private Vector2 prevChunk = new Vector2();
 
@@ -30,6 +31,12 @@ public class GenerateMap : MonoBehaviour
     private int sizeCh = GenerateParams.SizeChunk;
     private int distLoad = GenerateParams.LoadingDistance;
     private MyPerlin perlin;
+    private int startCountChunks = GenerateParams.StartCountChunks;
+    private float waterLevel = 0.3f;
+    private float sandLevel = 0.35f;
+    private float landLevel = 0.8f;
+    //private float landLevel = 0.8f;
+    
 
     void Start()
     {
@@ -43,32 +50,36 @@ public class GenerateMap : MonoBehaviour
     {
         LoadAndShowActualChunks();
     }
+
     private void RandomColoring(Chunk chunk)
     {
         for (int i = 0; i < chunk.Cells.Count; i++)
         {
-            float clr = Random.value * 0.1f - 0.05f;
+            float clr = Random.value * 0.2f - 0.2f;
             SpriteRenderer spr = chunk.Cells[i].CellObject.GetComponent<SpriteRenderer>();
             if (chunk.Cells[i].Type == water)
             {
-                float deep = chunk.Cells[i].Value * 1f;
+                float deep = chunk.Cells[i].Value * 0.8f;
                 spr.color = new UnityEngine.Color(0.25f + deep, 0.45f + clr + deep, 0.87f + deep, 1);
             }
             if (chunk.Cells[i].Type == land)
             {
-                float deep = chunk.Cells[i].Value * 0.3f - 0.2f;
+                float deep = chunk.Cells[i].Value * 0.2f - 0.15f;
                 spr.color = new UnityEngine.Color(0.32f + deep, 0.84f + clr + deep, 0.34f + deep, 1);
             }
             if (chunk.Cells[i].Type == sand)
             {
+                float deep = chunk.Cells[i].Value * 0.1f;
                 spr.color = new UnityEngine.Color(0.93f, 0.89f, 0.42f + clr, 1);
             }
             if (chunk.Cells[i].Type == mountain)
             {
-                spr.color = new UnityEngine.Color(0.5f - Mathf.Abs(clr), 0.5f - Mathf.Abs(clr), 0.5f + clr, 1);
+                float deep = chunk.Cells[i].Value * 0.2f;
+                spr.color = new UnityEngine.Color(0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 1);
             }
         }
     }
+
     private void LoadAndShowActualChunks()
     {
         prevChunk = currentChunk;
@@ -107,6 +118,7 @@ public class GenerateMap : MonoBehaviour
                 {
                     existFlag = true;
                     map[k].ChunkV.SetActive(true);
+                    activeMap.Add(map[k]);
                     break;
                 }
             }
@@ -122,6 +134,7 @@ public class GenerateMap : MonoBehaviour
         }
 
         map.AddRange(newChunks);
+        activeMap.AddRange(newChunks);
         SetAndCreateCellsOnTheMap(newChunks);
     }
 
@@ -131,7 +144,8 @@ public class GenerateMap : MonoBehaviour
         {
             if ((chunk.X == x) && (chunk.Y == y))
             {
-                chunk.ChunkV.SetActive(false);
+               //chunk.ChunkV.SetActive(false);
+               activeMap.Remove(chunk);
             }
         }
     }
@@ -144,9 +158,8 @@ public class GenerateMap : MonoBehaviour
             List<float> noiseValues = perlin.GetNoiseValues(chunk);
             for (int i = 0; i < chunk.Cells.Count; i++)
             {
-                chunk.Cells[i].Value = noiseValues[i] + 0.5f;
+                chunk.Cells[i].Value = noiseValues[i];
             }
-
             SetTypeToCellsInChunk(chunk);
             CreateCellsOnTheMap(chunk);
             RandomColoring(chunk);
@@ -166,11 +179,11 @@ public class GenerateMap : MonoBehaviour
     {
         foreach (var cell in chunk.Cells)
         {
-            if (cell.Value < 0.2)
+            if (cell.Value < waterLevel)
                 cell.Type = water;
-            else if (cell.Value < 0.3)
+            else if (cell.Value < sandLevel)
                 cell.Type = sand;
-            else if (cell.Value < 0.85)
+            else if (cell.Value < landLevel)
                 cell.Type = land;
             else
                 cell.Type = mountain;
@@ -180,11 +193,22 @@ public class GenerateMap : MonoBehaviour
     private void CreateStartChunks()
     {
         transformMap = Map.transform;
-        for (int i = 0; i < 2 * distLoad + 1; i++)
+        for (int i = 0; i < 2 * startCountChunks + 1; i++)
         {
-            for (int j = 0; j < 2 * distLoad + 1; j++)
+            for (int j = 0; j < 2 * startCountChunks + 1; j++)
             {
-                map.Add(new Chunk(i, j, Instantiate(ChunkPref, transformMap)));
+                Chunk newChunk = new Chunk(i, j, Instantiate(ChunkPref, transformMap));
+                map.Add(newChunk);
+                if ((i <= startCountChunks + distLoad) && (i >= startCountChunks - distLoad) &&
+                    (j <= startCountChunks + distLoad) && (j >= startCountChunks - distLoad))
+                {
+                    newChunk.ChunkV.SetActive(true);
+                    activeMap.Add(newChunk);
+                }
+                else
+                {
+                    newChunk.ChunkV.SetActive(false);
+                }
             }
         }
     }

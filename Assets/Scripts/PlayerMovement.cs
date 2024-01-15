@@ -12,19 +12,20 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 movement;
     private int sizeCh = GenerateParams.SizeChunk;
     private int distLoad = GenerateParams.LoadingDistance;
+    private int startCountChunks = GenerateParams.StartCountChunks;
 
     public GameObject player;
     public float speed = 10f;
 
     private void Awake()
     {
-        
+        player.transform.position = new Vector3((2 * startCountChunks + 1) * sizeCh / 2,
+                                        (2 * startCountChunks + 1) * sizeCh / 2, 0);
     }
 
     void Start()
     {
-        player.transform.position = new Vector3((2 * distLoad + 1) * sizeCh / 2,
-                                                (2 * distLoad + 1) * sizeCh / 2, 0);
+
     }
     void Update()
     {

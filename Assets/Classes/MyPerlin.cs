@@ -14,6 +14,8 @@ namespace Assets.Classes
         private int countNodes;
         private int sizeCh = GenerateParams.SizeChunk;
         private List<Chunk> map;
+        private string worldType = GenerateParams.WorldType;
+
 
         public MyPerlin(List<Chunk> map)
         {
@@ -22,7 +24,7 @@ namespace Assets.Classes
 
         public List<float> GetNoiseValues(Chunk currentChunk)
         {
-            SetAllNodes(currentChunk);
+            SetAllNodesForNodesType(currentChunk);
             return GetNoiseForChunk(currentChunk);
         }
 
@@ -31,14 +33,15 @@ namespace Assets.Classes
             List<float> noiseValues = new List<float>();
             List<List<float>> octaveValues = new List<List<float>>();
 
-            for (int k = 0; k < countOct; k++) // проход по всем октавам
+            for (int i = 0; i < 2; i++)
             {
-                int countNodes = (int)Mathf.Pow(2, k) + 1; // число узлов в сетке
-                int sizeSquareOctave = sizeCh / (countNodes - 1); // размер квадрата в сетке
-
-                SetNoiseValueOnOctave(currentChunk, octaveValues, k, countNodes, sizeSquareOctave);
+                for (int k = 0; k < countOct; k++) // проход по всем октавам
+                {
+                    int countNodes = (int)Mathf.Pow(2, k) + 1; // число узлов в сетке
+                    int sizeSquareOctave = sizeCh / (countNodes - 1); // размер квадрата в сетке
+                    SetNoiseValueOnOctave(currentChunk, octaveValues, k, countNodes, sizeSquareOctave, i);
+                }
             }
-
             for (int i = 0; i < currentChunk.Cells.Count; i++) // комбинация октавных шумов
             {
                 noiseValues.Add(0f);
@@ -47,14 +50,73 @@ namespace Assets.Classes
                     noiseValues[i] += octaveValues[k][i] / Mathf.Pow(2, k);
                 }
             }
-
-            //for (int i = 0; i < currentChunk.Cells.Count; i++)
-            //    noiseValues[i] += 0.5f;
-
-            return noiseValues;
+            for (int i = 0; i < 2; i++)
+            {
+                noiseValues = SmoothingNoise(noiseValues);
+            }
+            
+            noiseValues = ChangeValuesByWorldType(currentChunk, noiseValues);
+            return NormalizeNoise(currentChunk, noiseValues);
         }
 
-        private void SetNoiseValueOnOctave(Chunk currentChunk, List<List<float>> octaveValues, int k, int countNodes, int sizeSquareOctave)
+        private List<float> ChangeValuesByWorldType(Chunk chunk, List<float> values)
+        {
+            float minValue = -2;
+            float maxValue = 2;
+            float islandSize = 4 * sizeCh;
+            float lineSize = 4 * sizeCh;
+            float cyrclesSize = 2 * sizeCh;
+
+            for (int i = 0; i <  chunk.Cells.Count; i++)
+            {
+                //int x0;
+
+                int x = (int)chunk.Cells[i].X;
+                int y = (int)chunk.Cells[i].Y;               
+                switch (worldType)
+                {
+                    case "default":
+                        break;
+                    case "island":
+                        float x0 = GenerateParams.StartCountChunks * sizeCh;
+                        float y0 = GenerateParams.StartCountChunks * sizeCh;
+                        values[i] = values[i] - ((float) Mathf.Pow(x - x0, 2) / Mathf.Pow(islandSize, 2) +
+                                                ((float) Mathf.Pow(y - y0, 2) / Mathf.Pow(islandSize, 2))) + 0.25f;
+                        break;
+                    case "line":
+                        y0 = GenerateParams.StartCountChunks*sizeCh;
+                        values[i] = values[i] + Mathf.Atan((y - y0)/lineSize);
+                        break;
+                    case "circles":
+                        y0 = GenerateParams.StartCountChunks * sizeCh;
+                        x0 = (GenerateParams.StartCountChunks - 1/2) * sizeCh;
+                        values[i] = values[i] + (Mathf.Cos(Mathf.Sqrt(Mathf.Pow(x-x0,2) + Mathf.Pow(y - y0, 2))/cyrclesSize) - 0.7f);
+                        break;
+                }
+                if (values[i] < minValue)
+                    values[i] = minValue;
+                if (values[i] > maxValue) 
+                    values[i] = maxValue;
+            }
+            return values;
+        }
+
+        private List<float> NormalizeNoise(Chunk chunk, List<float> values)
+        {
+            float minParam = -0.75f;
+            float maxParam = 0.75f;
+            for (int i = 0; i < chunk.Cells.Count; i++) // нормировка шума
+            {
+                values[i] = (values[i] - minParam) / (maxParam - minParam);
+                if (values[i] > 1)
+                    values[i] = 1;
+                if (values[i] < 0)
+                    values[i] = 0;
+            }
+            return values;
+        }
+
+        private void SetNoiseValueOnOctave(Chunk currentChunk, List<List<float>> octaveValues, int k, int countNodes, int sizeSquareOctave, int nodesType)
         {
             octaveValues.Add(new List<float>());
 
@@ -104,19 +166,21 @@ namespace Assets.Classes
             return a + (b - a) * t;
         }
 
-        private void SetAllNodes(Chunk currentChunk)
+        private void SetAllNodesForNodesType(Chunk currentChunk)
         {
             SetSomeBoundNodes(currentChunk);
-
-            for (int k = 0; k < countOct; k++)
+            for (int nodeType = 0; nodeType < 2; nodeType++)
             {
-                int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
-
-                for (int i = 0; i < countAllNodes; i++)
+                for (int k = 0; k < countOct; k++)
                 {
-                    if (currentChunk.Nodes[k][i] == new Vector2(0, 0))
+                    int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
+
+                    for (int i = 0; i < countAllNodes; i++)
                     {
-                        currentChunk.Nodes[k][i] = GetRandomVector();
+                        if (currentChunk.Nodes[k][i] == new Vector2(0, 0))
+                        {
+                            currentChunk.Nodes[k][i] = GetRandomVector();
+                        }
                     }
                 }
             }
@@ -134,22 +198,26 @@ namespace Assets.Classes
         {
             foreach(var otherChunk in map)
             {
-                if (IsFindedChunk(otherChunk, currentChunk, "right")) // найден чанк справа
+                for (int i = 0; i < 2; i++) // проход по типам узлов
                 {
-                    BindChunks(otherChunk, currentChunk, "right");
+                    if (IsFindedChunk(otherChunk, currentChunk, "right")) // найден чанк справа
+                    {
+                        BindChunks(otherChunk, currentChunk, "right");
+                    }
+                    if (IsFindedChunk(otherChunk, currentChunk, "left")) // найден чанк слева
+                    {
+                        BindChunks(otherChunk, currentChunk, "left");
+                    }
+                    if (IsFindedChunk(otherChunk, currentChunk, "top")) // найден чанк сверху
+                    {
+                        BindChunks(otherChunk, currentChunk, "top");
+                    }
+                    if (IsFindedChunk(otherChunk, currentChunk, "bottom")) // найден чанк снизу
+                    {
+                        BindChunks(otherChunk, currentChunk, "bottom");
+                    }
                 }
-                if (IsFindedChunk(otherChunk, currentChunk, "left")) // найден чанк слева
-                {
-                    BindChunks(otherChunk, currentChunk, "left");
-                }
-                if (IsFindedChunk(otherChunk, currentChunk, "top")) // найден чанк сверху
-                {
-                    BindChunks(otherChunk, currentChunk, "top");
-                }
-                if (IsFindedChunk(otherChunk, currentChunk, "bottom")) // найден чанк снизу
-                {
-                    BindChunks(otherChunk, currentChunk, "bottom");
-                }
+
             }
         }
 
@@ -210,6 +278,74 @@ namespace Assets.Classes
                 }
             }
             return false;
+        }
+
+        public List<float> SmoothingNoise(List<float> oldValues)
+        {
+            List<float> newValues = new List<float>();
+            for (int i = 0; i < sizeCh;  i++)
+            {
+                for (int j = 0; j < sizeCh; j++)
+                {
+                    int horizontalEmpty = 0;
+                    int verticalEmpty = 0;
+                    if (i == 0) // не брать клетку слева
+                        horizontalEmpty = -1;
+                    if (i == sizeCh - 1) // не брать клетку справа
+                        horizontalEmpty = 1;
+                    if (j == 0) // не брать клетку снизу
+                        verticalEmpty = -1;
+                    if (j == sizeCh - 1) // не брать клетку сверху
+                        verticalEmpty = 1;
+                    float k1 = (float)1/5;
+                    float k2 = (1 - k1)/4;
+                    float k3 = (1 - k1)/3;
+                    float k4 = (1 - k1)/2;
+
+
+                    switch (horizontalEmpty, verticalEmpty)
+                    {
+                        case (0, 0):
+                            newValues.Add(oldValues[i*sizeCh+j]*k1 + oldValues[i * sizeCh + j - 1]*k2 + oldValues[i * sizeCh + j + 1]*k2 +
+                                          oldValues[(i-1) * sizeCh + j]*k2 + oldValues[(i + 1) * sizeCh + j]*k2);
+                            break;
+                        case (-1, 0):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 + oldValues[i * sizeCh + j + 1]*k3 +
+                                          oldValues[(i + 1) * sizeCh + j]*k3);
+                            break;
+                        case (-1, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k4 +
+                                          oldValues[(i + 1) * sizeCh + j]*k4);
+                            break;
+                        case (-1, 1):
+                            //Debug.Log($"{i} , {j}");
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k4 +
+                                          oldValues[(i + 1) * sizeCh + j] * k4);
+                            break;
+                        case (0, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k3 +
+                                          oldValues[(i - 1) * sizeCh + j]*k3 + oldValues[(i + 1) * sizeCh + j]*k3);
+                            break;
+                        case (0, 1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 +
+                                          oldValues[(i - 1) * sizeCh + j]*k3 + oldValues[(i + 1) * sizeCh + j] * k3);
+                            break;
+                        case (1, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k4 +
+                                          oldValues[(i - 1) * sizeCh + j]*k4);
+                            break;
+                        case (1, 0):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 + oldValues[i * sizeCh + j + 1]*k3 +
+                                          oldValues[(i - 1) * sizeCh + j]*k3);
+                            break;
+                        case (1, 1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k4 +
+                                          oldValues[(i - 1) * sizeCh + j]*k4);
+                            break;
+                    }
+                }
+            }
+            return newValues;
         }
     }
 }
