@@ -16,31 +16,25 @@ namespace Assets.Classes
         private List<Chunk> map;
         private string worldType = GenerateParams.WorldType;
 
+        private List<List<Vector2>> nodesGrid;
 
-        public MyPerlin(List<Chunk> map)
+
+        public MyPerlin(List<Chunk> map, List<List<Vector2>> nodesGrid)
         {
             this.map = map;
+            this.nodesGrid = nodesGrid;
         }
 
-        public List<float> GetNoiseValues(Chunk currentChunk)
-        {
-            SetAllNodesForNodesType(currentChunk);
-            return GetNoiseForChunk(currentChunk);
-        }
-
-        private List<float> GetNoiseForChunk(Chunk currentChunk)
+        public List<float> GetNoiseValues(Chunk currentChunk, bool toWorldType)
         {
             List<float> noiseValues = new List<float>();
             List<List<float>> octaveValues = new List<List<float>>();
 
-            for (int i = 0; i < 2; i++)
+            for (int k = 0; k < countOct; k++) // проход по всем октавам
             {
-                for (int k = 0; k < countOct; k++) // проход по всем октавам
-                {
-                    int countNodes = (int)Mathf.Pow(2, k) + 1; // число узлов в сетке
-                    int sizeSquareOctave = sizeCh / (countNodes - 1); // размер квадрата в сетке
-                    SetNoiseValueOnOctave(currentChunk, octaveValues, k, countNodes, sizeSquareOctave, i);
-                }
+                int countNodes = (int)Mathf.Pow(2, k) + 1; // число узлов в сетке
+                int sizeSquareOctave = sizeCh / (countNodes - 1); // размер квадрата в сетке
+                SetNoiseValueOnOctave(currentChunk, octaveValues, k, countNodes, sizeSquareOctave);
             }
             for (int i = 0; i < currentChunk.Cells.Count; i++) // комбинация октавных шумов
             {
@@ -54,8 +48,8 @@ namespace Assets.Classes
             {
                 noiseValues = SmoothingNoise(noiseValues);
             }
-            
-            noiseValues = ChangeValuesByWorldType(currentChunk, noiseValues);
+            if (toWorldType)
+                noiseValues = ChangeValuesByWorldType(currentChunk, noiseValues);
             return NormalizeNoise(currentChunk, noiseValues);
         }
 
@@ -116,7 +110,7 @@ namespace Assets.Classes
             return values;
         }
 
-        private void SetNoiseValueOnOctave(Chunk currentChunk, List<List<float>> octaveValues, int k, int countNodes, int sizeSquareOctave, int nodesType)
+        private void SetNoiseValueOnOctave(Chunk currentChunk, List<List<float>> octaveValues, int k, int countNodes, int sizeSquareOctave)
         {
             octaveValues.Add(new List<float>());
 
@@ -144,10 +138,10 @@ namespace Assets.Classes
                 int index3 = index1 + countNodes;
                 int index4 = index3 + 1;
 
-                nodeVectors.Add(currentChunk.Nodes[k][index1]);
-                nodeVectors.Add(currentChunk.Nodes[k][index2]);
-                nodeVectors.Add(currentChunk.Nodes[k][index3]);
-                nodeVectors.Add(currentChunk.Nodes[k][index4]);
+                nodeVectors.Add(nodesGrid[k][index1]);
+                nodeVectors.Add(nodesGrid[k][index2]);
+                nodeVectors.Add(nodesGrid[k][index3]);
+                nodeVectors.Add(nodesGrid[k][index4]);
 
                 for (int j = 0; j < 4; j++)
                 {
@@ -166,21 +160,93 @@ namespace Assets.Classes
             return a + (b - a) * t;
         }
 
-        private void SetAllNodesForNodesType(Chunk currentChunk)
+        public List<float> SmoothingNoise(List<float> oldValues)
+        {
+            List<float> newValues = new List<float>();
+            for (int i = 0; i < sizeCh; i++)
+            {
+                for (int j = 0; j < sizeCh; j++)
+                {
+                    int horizontalEmpty = 0;
+                    int verticalEmpty = 0;
+                    if (i == 0) // не брать клетку слева
+                        horizontalEmpty = -1;
+                    if (i == sizeCh - 1) // не брать клетку справа
+                        horizontalEmpty = 1;
+                    if (j == 0) // не брать клетку снизу
+                        verticalEmpty = -1;
+                    if (j == sizeCh - 1) // не брать клетку сверху
+                        verticalEmpty = 1;
+                    float k1 = (float)1 / 5;
+                    float k2 = (1 - k1) / 4;
+                    float k3 = (1 - k1) / 3;
+                    float k4 = (1 - k1) / 2;
+
+
+                    switch (horizontalEmpty, verticalEmpty)
+                    {
+                        case (0, 0):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k2 + oldValues[i * sizeCh + j + 1] * k2 +
+                                          oldValues[(i - 1) * sizeCh + j] * k2 + oldValues[(i + 1) * sizeCh + j] * k2);
+                            break;
+                        case (-1, 0):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k3 + oldValues[i * sizeCh + j + 1] * k3 +
+                                          oldValues[(i + 1) * sizeCh + j] * k3);
+                            break;
+                        case (-1, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1] * k4 +
+                                          oldValues[(i + 1) * sizeCh + j] * k4);
+                            break;
+                        case (-1, 1):
+                            //Debug.Log($"{i} , {j}");
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k4 +
+                                          oldValues[(i + 1) * sizeCh + j] * k4);
+                            break;
+                        case (0, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1] * k3 +
+                                          oldValues[(i - 1) * sizeCh + j] * k3 + oldValues[(i + 1) * sizeCh + j] * k3);
+                            break;
+                        case (0, 1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k3 +
+                                          oldValues[(i - 1) * sizeCh + j] * k3 + oldValues[(i + 1) * sizeCh + j] * k3);
+                            break;
+                        case (1, -1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1] * k4 +
+                                          oldValues[(i - 1) * sizeCh + j] * k4);
+                            break;
+                        case (1, 0):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k3 + oldValues[i * sizeCh + j + 1] * k3 +
+                                          oldValues[(i - 1) * sizeCh + j] * k3);
+                            break;
+                        case (1, 1):
+                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1] * k4 +
+                                          oldValues[(i - 1) * sizeCh + j] * k4);
+                            break;
+                    }
+                }
+            }
+            return newValues;
+        }
+
+        public void SetNodes(Chunk currentChunk)
+        {
+            SetAllNodesForNodes(currentChunk);
+        }
+        private void SetAllNodesForNodes(Chunk currentChunk)
         {
             SetSomeBoundNodes(currentChunk);
-            for (int nodeType = 0; nodeType < 2; nodeType++)
+            for (int k = 0; k < countOct; k++)
             {
-                for (int k = 0; k < countOct; k++)
+                int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
+                for (int i = 0; i < countAllNodes; i++)
                 {
-                    int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
-
-                    for (int i = 0; i < countAllNodes; i++)
+                    if (currentChunk.NodesHeight[k][i] == new Vector2(0, 0))
                     {
-                        if (currentChunk.Nodes[k][i] == new Vector2(0, 0))
-                        {
-                            currentChunk.Nodes[k][i] = GetRandomVector();
-                        }
+                        currentChunk.NodesHeight[k][i] = GetRandomVector();
+                    }
+                    if (currentChunk.NodesTrees[k][i] == new Vector2(0, 0))
+                    {
+                        currentChunk.NodesTrees[k][i] = GetRandomVector();
                     }
                 }
             }
@@ -196,7 +262,7 @@ namespace Assets.Classes
 
         private void SetSomeBoundNodes(Chunk currentChunk)
         {
-            foreach(var otherChunk in map)
+            foreach (var otherChunk in map)
             {
                 for (int i = 0; i < 2; i++) // проход по типам узлов
                 {
@@ -236,21 +302,25 @@ namespace Assets.Classes
                     {
                         case "right":
                             indexrl = (countNodes - 1) * countNodes + i;
-                            currentChunk.Nodes[k][indexrl] = otherChunk.Nodes[k][i];
+                            currentChunk.NodesHeight[k][indexrl] = otherChunk.NodesHeight[k][i];
+                            currentChunk.NodesTrees[k][indexrl] = otherChunk.NodesTrees[k][i];
                             break;
                         case "left":
                             indexrl = (countNodes - 1) * countNodes + i;
-                            currentChunk.Nodes[k][i] = otherChunk.Nodes[k][indexrl];
+                            currentChunk.NodesHeight[k][i] = otherChunk.NodesHeight[k][indexrl];
+                            currentChunk.NodesTrees[k][i] = otherChunk.NodesTrees[k][indexrl];
                             break;
                         case "top":
                             indextb1 = (i + 1) * countNodes - 1;
                             indextb2 = i * countNodes;
-                            currentChunk.Nodes[k][indextb1] = otherChunk.Nodes[k][indextb2];
+                            currentChunk.NodesHeight[k][indextb1] = otherChunk.NodesHeight[k][indextb2];
+                            currentChunk.NodesTrees[k][indextb1] = otherChunk.NodesTrees[k][indextb2];
                             break;
                         case "bottom":
                             indextb1 = (i + 1) * countNodes - 1;
                             indextb2 = i * countNodes;
-                            currentChunk.Nodes[k][indextb2] = otherChunk.Nodes[k][indextb1];
+                            currentChunk.NodesHeight[k][indextb2] = otherChunk.NodesHeight[k][indextb1];
+                            currentChunk.NodesTrees[k][indextb2] = otherChunk.NodesTrees[k][indextb1];
                             break;
                         default:
                             Debug.Log("Ошибка");
@@ -262,7 +332,7 @@ namespace Assets.Classes
 
         private bool IsFindedChunk(Chunk otherChunk, Chunk currentChunk, string where)
         {
-            if (otherChunk.Nodes[0][0] != new Vector2())
+            if (otherChunk.NodesHeight[0][0] != new Vector2())
             {
                 switch (where)
                 {
@@ -280,72 +350,120 @@ namespace Assets.Classes
             return false;
         }
 
-        public List<float> SmoothingNoise(List<float> oldValues)
-        {
-            List<float> newValues = new List<float>();
-            for (int i = 0; i < sizeCh;  i++)
-            {
-                for (int j = 0; j < sizeCh; j++)
-                {
-                    int horizontalEmpty = 0;
-                    int verticalEmpty = 0;
-                    if (i == 0) // не брать клетку слева
-                        horizontalEmpty = -1;
-                    if (i == sizeCh - 1) // не брать клетку справа
-                        horizontalEmpty = 1;
-                    if (j == 0) // не брать клетку снизу
-                        verticalEmpty = -1;
-                    if (j == sizeCh - 1) // не брать клетку сверху
-                        verticalEmpty = 1;
-                    float k1 = (float)1/5;
-                    float k2 = (1 - k1)/4;
-                    float k3 = (1 - k1)/3;
-                    float k4 = (1 - k1)/2;
+        //private void SetAllNodesForNodesType(Chunk currentChunk)
+        //{
+        //    SetSomeBoundNodes(currentChunk);
+        //    for (int nodeType = 0; nodeType < 2; nodeType++)
+        //    {
+        //        for (int k = 0; k < countOct; k++)
+        //        {
+        //            int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
+
+        //            for (int i = 0; i < countAllNodes; i++)
+        //            {
+        //                if (currentChunk.Nodes[k][i] == new Vector2(0, 0))
+        //                {
+        //                    currentChunk.Nodes[k][i] = GetRandomVector();
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private Vector2 GetRandomVector()
+        //{
+        //    float x1 = (float)(2 * Random.value - 1);
+        //    float x2 = (float)(2 * Random.value - 1);
+
+        //    return new Vector2(x1 / Mathf.Sqrt(x1 * x1 + x2 * x2), x2 / Mathf.Sqrt(x1 * x1 + x2 * x2));
+        //}
+
+        //private void SetSomeBoundNodes(Chunk currentChunk)
+        //{
+        //    foreach(var otherChunk in map)
+        //    {
+        //        for (int i = 0; i < 2; i++) // проход по типам узлов
+        //        {
+        //            if (IsFindedChunk(otherChunk, currentChunk, "right")) // найден чанк справа
+        //            {
+        //                BindChunks(otherChunk, currentChunk, "right");
+        //            }
+        //            if (IsFindedChunk(otherChunk, currentChunk, "left")) // найден чанк слева
+        //            {
+        //                BindChunks(otherChunk, currentChunk, "left");
+        //            }
+        //            if (IsFindedChunk(otherChunk, currentChunk, "top")) // найден чанк сверху
+        //            {
+        //                BindChunks(otherChunk, currentChunk, "top");
+        //            }
+        //            if (IsFindedChunk(otherChunk, currentChunk, "bottom")) // найден чанк снизу
+        //            {
+        //                BindChunks(otherChunk, currentChunk, "bottom");
+        //            }
+        //        }
+
+        //    }
+        //}
+
+        //private void BindChunks(Chunk otherChunk, Chunk currentChunk, string side)
+        //{
+        //    for (int k = 0; k < countOct; k++)
+        //    {
+        //        countNodes = (int)Mathf.Pow(2, k) + 1;
+        //        for (int i = 0; i < countNodes; i++)
+        //        {
+        //            //Vector2 randomVector = new Vector2(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
+        //            int indexrl = 0;
+        //            int indextb1 = 0;
+        //            int indextb2 = 0;
+        //            switch (side)
+        //            {
+        //                case "right":
+        //                    indexrl = (countNodes - 1) * countNodes + i;
+        //                    currentChunk.Nodes[k][indexrl] = otherChunk.Nodes[k][i];
+        //                    break;
+        //                case "left":
+        //                    indexrl = (countNodes - 1) * countNodes + i;
+        //                    currentChunk.Nodes[k][i] = otherChunk.Nodes[k][indexrl];
+        //                    break;
+        //                case "top":
+        //                    indextb1 = (i + 1) * countNodes - 1;
+        //                    indextb2 = i * countNodes;
+        //                    currentChunk.Nodes[k][indextb1] = otherChunk.Nodes[k][indextb2];
+        //                    break;
+        //                case "bottom":
+        //                    indextb1 = (i + 1) * countNodes - 1;
+        //                    indextb2 = i * countNodes;
+        //                    currentChunk.Nodes[k][indextb2] = otherChunk.Nodes[k][indextb1];
+        //                    break;
+        //                default:
+        //                    Debug.Log("Ошибка");
+        //                    break;
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private bool IsFindedChunk(Chunk otherChunk, Chunk currentChunk, string where)
+        //{
+        //    if (otherChunk.Nodes[0][0] != new Vector2())
+        //    {
+        //        switch (where)
+        //        {
+        //            case "right":
+        //                return (otherChunk.X == currentChunk.X + 1) && (otherChunk.Y == currentChunk.Y);
+        //            case "left":
+        //                return (otherChunk.X == currentChunk.X - 1) && (otherChunk.Y == currentChunk.Y);
+        //            case "top":
+        //                return (otherChunk.X == currentChunk.X) && (otherChunk.Y == currentChunk.Y + 1);
+        //            case "bottom":
+        //                return (otherChunk.X == currentChunk.X) && (otherChunk.Y == currentChunk.Y - 1);
+        //            default: return false;
+        //        }
+        //    }
+        //    return false;
+        //}
 
 
-                    switch (horizontalEmpty, verticalEmpty)
-                    {
-                        case (0, 0):
-                            newValues.Add(oldValues[i*sizeCh+j]*k1 + oldValues[i * sizeCh + j - 1]*k2 + oldValues[i * sizeCh + j + 1]*k2 +
-                                          oldValues[(i-1) * sizeCh + j]*k2 + oldValues[(i + 1) * sizeCh + j]*k2);
-                            break;
-                        case (-1, 0):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 + oldValues[i * sizeCh + j + 1]*k3 +
-                                          oldValues[(i + 1) * sizeCh + j]*k3);
-                            break;
-                        case (-1, -1):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k4 +
-                                          oldValues[(i + 1) * sizeCh + j]*k4);
-                            break;
-                        case (-1, 1):
-                            //Debug.Log($"{i} , {j}");
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k4 +
-                                          oldValues[(i + 1) * sizeCh + j] * k4);
-                            break;
-                        case (0, -1):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k3 +
-                                          oldValues[(i - 1) * sizeCh + j]*k3 + oldValues[(i + 1) * sizeCh + j]*k3);
-                            break;
-                        case (0, 1):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 +
-                                          oldValues[(i - 1) * sizeCh + j]*k3 + oldValues[(i + 1) * sizeCh + j] * k3);
-                            break;
-                        case (1, -1):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j + 1]*k4 +
-                                          oldValues[(i - 1) * sizeCh + j]*k4);
-                            break;
-                        case (1, 0):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k3 + oldValues[i * sizeCh + j + 1]*k3 +
-                                          oldValues[(i - 1) * sizeCh + j]*k3);
-                            break;
-                        case (1, 1):
-                            newValues.Add(oldValues[i * sizeCh + j] * k1 + oldValues[i * sizeCh + j - 1]*k4 +
-                                          oldValues[(i - 1) * sizeCh + j]*k4);
-                            break;
-                    }
-                }
-            }
-            return newValues;
-        }
     }
 }

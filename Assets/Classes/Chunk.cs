@@ -16,15 +16,16 @@ namespace Assets.Classes
         public int Y { get; set; }
         public List<Cell> Cells { get; set; }
         public GameObject ChunkV { get; set; }
-        public List<List<Vector2>> Nodes { get; set; }
-        //public List<List<Vector2>> NodesTrees { get; set; }
+        public List<List<Vector2>> NodesHeight { get; set; }
+        public List<List<Vector2>> NodesTrees { get; set; }
 
         public Chunk(int x, int y, GameObject chunkV)
         {
             X = x;
             Y = y;
             ChunkV = chunkV;
-            Nodes = new List<List<Vector2>>();
+            NodesHeight = new List<List<Vector2>>();
+            NodesTrees = new List<List<Vector2>>();
             Cells = new List<Cell>();
 
             GenerateCells(x, y);
@@ -46,18 +47,20 @@ namespace Assets.Classes
         {
             for (int k = 0; k < CountOct; k++)
             {
-                Nodes.Add(new List<Vector2>()); // лист узлов для генерации высот
+                NodesHeight.Add(new List<Vector2>()); // лист узлов для генерации высот
+                NodesTrees.Add(new List<Vector2>());
                 int countAllNodes = (int)Math.Pow(Math.Pow(2, k) + 1, 2);
                 for (int i = 0; i < countAllNodes; i++)
                 {
-                    Nodes[k].Add(new Vector2(0, 0));
+                    NodesHeight[k].Add(new Vector2(0, 0));
+                    NodesTrees[k].Add(new Vector2(0, 0));
                 }
             }
         }
 
         public void SetNodesHeight(Chunk chunk, List<List<Vector2>> nodes)
         {
-            chunk.Nodes = nodes;
+            chunk.NodesHeight = nodes;
         }
     }
 }

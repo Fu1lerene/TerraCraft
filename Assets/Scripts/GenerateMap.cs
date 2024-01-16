@@ -18,6 +18,10 @@ public class GenerateMap : MonoBehaviour
     public GameObject water;
     public GameObject sand;
     public GameObject mountain;
+
+    public GameObject tree;
+    public GameObject grass1;
+
     public GameObject Map;
     public GameObject ChunkPref;
     public GameObject player;
@@ -30,7 +34,9 @@ public class GenerateMap : MonoBehaviour
     private Transform transformMap;
     private int sizeCh = GenerateParams.SizeChunk;
     private int distLoad = GenerateParams.LoadingDistance;
-    private MyPerlin perlin;
+    private MyPerlin perlinHeight;
+    private MyPerlin perlinTrees;
+    private NodeVectors nodeVect;
     private int startCountChunks = GenerateParams.StartCountChunks;
     private float waterLevel = 0.3f;
     private float sandLevel = 0.35f;
@@ -51,7 +57,7 @@ public class GenerateMap : MonoBehaviour
         LoadAndShowActualChunks();
     }
 
-    private void RandomColoring(Chunk chunk)
+    private void RandomColoringCells(Chunk chunk)
     {
         for (int i = 0; i < chunk.Cells.Count; i++)
         {
@@ -76,6 +82,22 @@ public class GenerateMap : MonoBehaviour
             {
                 float deep = chunk.Cells[i].Value * 0.2f;
                 spr.color = new UnityEngine.Color(0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 1);
+            }
+        }
+    }
+
+    private void RandomColorAndSizeTrees(Chunk chunk)
+    {
+        foreach (Cell cell in chunk.Cells)
+        {
+            float clr = Random.value * 0.1f - 0.2f;
+            float rndS = Random.value * 0.4f - 0.2f;
+            
+            if (cell.Vegetation == tree)
+            {
+                SpriteRenderer spr = cell.VegetationObject.GetComponent<SpriteRenderer>();
+                spr.color = new UnityEngine.Color(0.14f, 0.56f+clr, 0.18f, 1);
+                cell.VegetationObject.transform.localScale += new Vector3(rndS, rndS, rndS);
             }
         }
     }
@@ -152,17 +174,27 @@ public class GenerateMap : MonoBehaviour
 
     private void SetAndCreateCellsOnTheMap(List<Chunk> chunks)
     {
-        perlin = new MyPerlin(map);
+        
         foreach (Chunk chunk in chunks)
         {
-            List<float> noiseValues = perlin.GetNoiseValues(chunk);
+            perlinHeight = new MyPerlin(map, chunk.NodesHeight);
+            perlinTrees = new MyPerlin(map, chunk.NodesTrees);
+            perlinHeight.SetNodes(chunk); // установка узлов всех типов
+            List<float> noiseValuesHeight = perlinHeight.GetNoiseValues(chunk, true); // получение высотного шума
+            List<float> noiseValuesTrees = perlinTrees.GetNoiseValues(chunk, false); // получение шума для генерации лесов
             for (int i = 0; i < chunk.Cells.Count; i++)
             {
-                chunk.Cells[i].Value = noiseValues[i];
+                chunk.Cells[i].Value = noiseValuesHeight[i];
+                chunk.Cells[i].VegetationValue = noiseValuesTrees[i];
             }
+
             SetTypeToCellsInChunk(chunk);
             CreateCellsOnTheMap(chunk);
-            RandomColoring(chunk);
+            RandomColoringCells(chunk);
+
+            GenerateVegetations(chunk);
+            CreateVegetationsOnCells(chunk);
+            RandomColorAndSizeTrees(chunk);
         }
     }
 
@@ -173,6 +205,7 @@ public class GenerateMap : MonoBehaviour
         {
             chunk.Cells[i].CellObject = Instantiate(chunk.Cells[i].Type, new Vector3(chunk.Cells[i].X, chunk.Cells[i].Y, 0), Quaternion.identity, transformChunk);
         }
+
     }
 
     private void SetTypeToCellsInChunk(Chunk chunk)
@@ -187,6 +220,34 @@ public class GenerateMap : MonoBehaviour
                 cell.Type = land;
             else
                 cell.Type = mountain;
+        }
+    }
+
+    private void GenerateVegetations(Chunk chunk)
+    {
+        float densityTrees = GenerateParams.DensityForest;
+        float densityGrass = GenerateParams.DensityGrass;
+        foreach (var cell in chunk.Cells)
+        {
+            float rnd = Random.value;
+            if ((rnd < cell.VegetationValue + densityTrees) && (cell.Type == land) && (cell.Vegetation == null))
+                cell.Vegetation = tree;
+        }
+        foreach (var cell in chunk.Cells)
+        {
+            float rnd = Random.value;
+            if ((rnd < densityGrass) && (cell.Type == land) && (cell.Vegetation == null))
+                cell.Vegetation = grass1;
+        }
+    }
+
+    private void CreateVegetationsOnCells(Chunk chunk)
+    {
+        foreach (var cell in chunk.Cells)
+        {
+            Transform transformCell = cell.CellObject.GetComponent<Transform>();
+            if (cell.Vegetation != null)
+                cell.VegetationObject = Instantiate(cell.Vegetation, new Vector3(cell.X, cell.Y, 0), Quaternion.identity, transformCell);
         }
     }
 
