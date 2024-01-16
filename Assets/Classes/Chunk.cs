@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Classes
 {
-    internal class Chunk
+    public class Chunk
     {
         private int sizeCh = GenerateParams.SizeChunk;
         private int CountOct = GenerateParams.CountOctaves;

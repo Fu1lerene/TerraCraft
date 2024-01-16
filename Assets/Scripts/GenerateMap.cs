@@ -27,7 +27,7 @@ public class GenerateMap : MonoBehaviour
     public GameObject player;
 
     private List<Chunk> map = new List<Chunk>();
-    private List<Chunk> activeMap = new List<Chunk>();
+    public List<Chunk> activeMap = new List<Chunk>();
     private Vector2 currentChunk = new Vector2();
     private Vector2 prevChunk = new Vector2();
 
@@ -166,7 +166,7 @@ public class GenerateMap : MonoBehaviour
         {
             if ((chunk.X == x) && (chunk.Y == y))
             {
-               //chunk.ChunkV.SetActive(false);
+               chunk.ChunkV.SetActive(false);
                activeMap.Remove(chunk);
             }
         }
@@ -174,7 +174,6 @@ public class GenerateMap : MonoBehaviour
 
     private void SetAndCreateCellsOnTheMap(List<Chunk> chunks)
     {
-        
         foreach (Chunk chunk in chunks)
         {
             perlinHeight = new MyPerlin(map, chunk.NodesHeight);

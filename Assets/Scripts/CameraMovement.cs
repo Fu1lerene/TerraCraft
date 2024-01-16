@@ -9,8 +9,8 @@ public class CameraMovement : MonoBehaviour
     public GameObject player;
 
     private int scrollSpeed = 10;
-    private float camMin = 10;
-    private float camMax = 300;
+    public float camMin = 3;
+    public float camMax = 10;
 
 
 

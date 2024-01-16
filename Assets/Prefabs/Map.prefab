@@ -45,10 +45,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entities: {fileID: 3842416645708155326, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
-  land: {fileID: 993100588336077604, guid: 4174e3c2d2aec0c46b4e6306897f2f80, type: 3}
-  water: {fileID: 7597593461656029217, guid: e80fd462d44543341abf16a687b78c2c, type: 3}
-  sand: {fileID: 162724424844935367, guid: bc671fcbe48d7f1449c18f026c553926, type: 3}
-  mountain: {fileID: 6113921178023296319, guid: 7b34fec436866bf4d88b63d40f483002, type: 3}
+  land: {fileID: 993100588336077604, guid: c14ea4708d90f9a43835d16b98f34c7b, type: 3}
+  water: {fileID: 7597593461656029217, guid: 3f32a83915a47ef45bdc0bd2b13d4e08, type: 3}
+  sand: {fileID: 162724424844935367, guid: fd34ce3d5cdb5524c89070b4e3c180e8, type: 3}
+  mountain: {fileID: 6113921178023296319, guid: 40d0083f2161e1c4c9eb30f2c246a67d, type: 3}
+  tree: {fileID: 1418385025366777001, guid: 71bdef699b487ad43a145935a82a6c92, type: 3}
+  grass1: {fileID: 4326004699523164443, guid: 0f90e1bad9f75a64bb195599e3d31eaf, type: 3}
   Map: {fileID: 7854587295206801342}
   ChunkPref: {fileID: 3601361822498451631, guid: 45f5279ef9695bf41a9bae2b7f6e780c, type: 3}
   player: {fileID: 6946398426423908491, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
