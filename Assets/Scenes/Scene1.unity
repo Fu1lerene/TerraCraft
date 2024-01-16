@@ -139,6 +139,14 @@ PrefabInstance:
       propertyPath: StaminaSlider
       value: 
       objectReference: {fileID: 969770477}
+    - target: {fileID: 5928957789237311857, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5928957789237311857, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
+      propertyPath: m_FlipY
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6946398426423908491, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
       propertyPath: m_Name
       value: Player
@@ -206,7 +214,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6946398426423908491, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1298864083}
   m_SourcePrefab: {fileID: 100100000, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
 --- !u!1 &235507516
 GameObject:
@@ -762,7 +773,7 @@ MonoBehaviour:
   cam: {fileID: 993933897}
   player: {fileID: 1298864078}
   camMin: 3
-  camMax: 10
+  camMax: 500
 --- !u!1 &1065231252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,6 +1115,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1580278738230755119, guid: a848f684ab6b18349b6f5b1cd2c283a5, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1298864078}
     - target: {fileID: 7854587295206801342, guid: a848f684ab6b18349b6f5b1cd2c283a5, type: 3}
       propertyPath: m_Name
       value: Map
@@ -1123,6 +1138,18 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7476708165240816124, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
   m_PrefabInstance: {fileID: 2520548}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1298864083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298864078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e246ea7df4422ca4bbecd5d9fe7bf34f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1357481684
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -23,13 +23,15 @@ public class PlayerActions : MonoBehaviour
     private Player pl;
     private List<Chunk> activeMap;
     private Chunk currentChunk;
+    private Vector2 currentPos;
+    public Cell currentCell;
     void Start()
     {
         lanternOn = false;
         lantern.intensity = 2.5f;
         lantern.range = 5.5f;
         pl = player.GetComponent<PlayerMovement>().pl;
-        activeMap = MapObject.GetComponent<GenerateMap>().activeMap;
+        
     }
 
     // Update is called once per frame
@@ -38,6 +40,33 @@ public class PlayerActions : MonoBehaviour
         SwitchLight();
         StaminaSlider.value = pl.Stamina.Value;
         HPSlider.value = pl.HP;
+        activeMap = MapObject.GetComponent<GenerateMap>().activeMap;
+
+        //Debug.Log(activeMap.Count);
+        //Debug.Log(activeMap[0].X);
+        GetThisCell();
+        ActionsFromKey();
+    }
+
+    private void GetThisCell()
+    {
+        currentPos = MapObject.GetComponent<GenerateMap>().currentChunk;
+        foreach (Chunk chunk in activeMap)
+        {
+            if (chunk.X == currentPos.x && (chunk.Y == currentPos.y))
+            {
+                currentChunk = chunk;
+                foreach (Cell cell in currentChunk.Cells)
+                {
+                    if (((int)cell.X == (int)(player.transform.position.x + 0.5f)) && ((int)cell.Y == (int)(player.transform.position.y + 0.5f)))
+                    {
+                        currentCell = cell;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
     }
 
     private void SwitchLight()
@@ -54,6 +83,18 @@ public class PlayerActions : MonoBehaviour
             {
                 lantern.intensity -= intensityLight;
                 lantern.range -= radiusLight;
+            }
+        }
+    }
+
+    private void ActionsFromKey()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) 
+        {
+            if (currentCell.Vegetation != null)
+            {
+                currentCell.Vegetation = null;
+                Destroy(currentCell.VegetationObject);
             }
         }
     }

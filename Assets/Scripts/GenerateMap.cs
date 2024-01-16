@@ -28,7 +28,7 @@ public class GenerateMap : MonoBehaviour
 
     private List<Chunk> map = new List<Chunk>();
     public List<Chunk> activeMap = new List<Chunk>();
-    private Vector2 currentChunk = new Vector2();
+    public Vector2 currentChunk = new Vector2();
     private Vector2 prevChunk = new Vector2();
 
     private Transform transformMap;
@@ -111,6 +111,7 @@ public class GenerateMap : MonoBehaviour
         if (currentChunk.x > prevChunk.x) // добавить справа 
         {
             ShowActualChunks(1, 0);
+            
         }
         if (currentChunk.x < prevChunk.x) // добавить слева
         {
