@@ -6,31 +6,29 @@ using UnityEngine;
 
 public class GenerateAnimals : MonoBehaviour
 {
-    public GameObject sheep;
-    public GameObject map;
-    public GameObject entities;
-    public GameObject land;
+    public GameObject Sheep;
+    public GameObject Map;
+    public GameObject Land;
 
-
-    public List<Chunk> activeMap;
-    private List<Animal> sheeps = new List<Animal>();
+    public List<Animal> sheeps = new List<Animal>();
+    public List<Animal> activeSheeps = new List<Animal>();
     private int sizeCh = GenerateParams.SizeChunk;
 
 
     void Start()
     {
-        activeMap = map.GetComponent<GenerateMap>().activeMap;
-        SpawnAnimals(activeMap);
+
     }
 
-    private void SpawnAnimals(List<Chunk> chunks)
+    public void SpawnAnimals(List<Chunk> chunks)
     {
         foreach (var chunk in chunks)
         {
+            List<Animal> newSheeps = new List<Animal>();
             int count = 0;
             foreach (var cell in chunk.Cells) /// Количество допустимых клеток
             {
-                if (cell.Type == land)
+                if (cell.Type == Land)
                     count++;
             }
 
@@ -44,9 +42,9 @@ public class GenerateAnimals : MonoBehaviour
                 {
                     if (cell.X == x && cell.Y == y)
                     {
-                        if (cell.Type == land)
+                        if (cell.Type == Land)
                         {
-                            sheeps.Add(new Sheep(x, y));
+                            newSheeps.Add(new Sheep(x, y));
                             break;
                         }
                         else
@@ -57,15 +55,14 @@ public class GenerateAnimals : MonoBehaviour
                     }
                 }
             }
-        }
-        foreach (var sh in sheeps) /// Спавн животных
-        {
-            sh.AnimalObj = Instantiate(sheep, new Vector3(sh.X, sh.Y, 0), Quaternion.identity, entities.transform);
+            sheeps.AddRange(newSheeps);
+            foreach (var sh in newSheeps)
+                sh.AnimalObj = Instantiate(Sheep, new Vector3(sh.X, sh.Y, 0), Quaternion.identity, transform);
+            activeSheeps.AddRange(newSheeps);
         }
     }
 
     void Update()
     {
-        
     }
 }

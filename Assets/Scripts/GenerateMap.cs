@@ -13,25 +13,20 @@ using UnityEngine.UIElements;
 
 public class GenerateMap : MonoBehaviour
 {
-    public GameObject entities;
-    public GameObject land;
-    public GameObject water;
-    public GameObject sand;
-    public GameObject mountain;
-
-    public GameObject tree;
-    public GameObject grass1;
-
+    public GameObject Entities;
+    public GameObject Land;
+    public GameObject Water;
+    public GameObject Sand;
+    public GameObject Mountain;
+    public GameObject Tree;
+    public GameObject Grass;
     public GameObject Map;
     public GameObject ChunkPref;
-    public GameObject player;
 
-    private List<Chunk> map = new List<Chunk>();
     public List<Chunk> activeMap = new List<Chunk>();
-    public Vector2 PosCurrentChunk { get; set; }
-    public Vector2 PosPrevChunk { get; set; }
 
-    private Transform transformMap;
+    public List<Chunk> map = new List<Chunk>();
+    public Vector2 posCurrentChunk;
     private int distLoad = GenerateParams.LoadingDistance;
     private MyPerlin perlinHeight;
     private MyPerlin perlinTrees;
@@ -43,13 +38,13 @@ public class GenerateMap : MonoBehaviour
 
     private void Awake()
     {
-        CreateStartChunks();
-        SetAndCreateCellsOnTheMap(map);
+
     }
 
     void Start()
     {
-
+        CreateStartChunks();
+        SetAndCreateCellsOnTheMap(map);
     }
 
     private void Update()
@@ -63,22 +58,22 @@ public class GenerateMap : MonoBehaviour
         {
             float clr = Random.value * 0.2f - 0.2f;
             SpriteRenderer spr = chunk.Cells[i].CellObject.GetComponent<SpriteRenderer>();
-            if (chunk.Cells[i].Type == water)
+            if (chunk.Cells[i].Type == Water)
             {
                 float deep = chunk.Cells[i].Value * 0.8f;
                 spr.color = new UnityEngine.Color(0.25f + deep, 0.45f + clr + deep, 0.87f + deep, 1);
             }
-            if (chunk.Cells[i].Type == land)
+            if (chunk.Cells[i].Type == Land)
             {
                 float deep = chunk.Cells[i].Value * 0.2f - 0.15f;
                 spr.color = new UnityEngine.Color(0.32f + deep, 0.84f + clr + deep, 0.34f + deep, 1);
             }
-            if (chunk.Cells[i].Type == sand)
+            if (chunk.Cells[i].Type == Sand)
             {
                 //float deep = chunk.Cells[i].Value * 0.1f;
                 spr.color = new UnityEngine.Color(0.93f, 0.89f, 0.42f + clr, 1);
             }
-            if (chunk.Cells[i].Type == mountain)
+            if (chunk.Cells[i].Type == Mountain)
             {
                 float deep = chunk.Cells[i].Value * 0.2f;
                 spr.color = new UnityEngine.Color(0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 0.5f + Mathf.Abs(clr) - deep, 1);
@@ -93,7 +88,7 @@ public class GenerateMap : MonoBehaviour
             float clr = Random.value * 0.1f - 0.2f;
             float rndS = Random.value * 0.4f - 0.2f;
             
-            if (cell.Vegetation == tree)
+            if (cell.Vegetation == Tree)
             {
                 SpriteRenderer spr = cell.VegetationObject.GetComponent<SpriteRenderer>();
                 spr.color = new UnityEngine.Color(0.14f, 0.56f+clr, 0.18f, 1);
@@ -102,59 +97,59 @@ public class GenerateMap : MonoBehaviour
         }
     }
 
-    public void LoadAndShowActualChunks()
-    {
-        if (PosCurrentChunk.x > PosPrevChunk.x) // добавить справа 
-        {
-            ShowActualChunks(1, 0);
-        }
-        if (PosCurrentChunk.x < PosPrevChunk.x) // добавить слева
-        {
-            ShowActualChunks(-1, 0);
-        }
-        if (PosCurrentChunk.y > PosPrevChunk.y) // добавить сверху
-        {
-            ShowActualChunks(0, 1);
-        }
-        if (PosCurrentChunk.y < PosPrevChunk.y) // добавить снизу
-        {
-            ShowActualChunks(0, -1);
-        }
-    }
+    //public void LoadAndShowActualChunks()
+    //{
+    //    if (PosCurrentChunk.x > PosPrevChunk.x) // добавить справа 
+    //    {
+    //        ShowActualChunks(1, 0);
+    //    }
+    //    if (PosCurrentChunk.x < PosPrevChunk.x) // добавить слева
+    //    {
+    //        ShowActualChunks(-1, 0);
+    //    }
+    //    if (PosCurrentChunk.y > PosPrevChunk.y) // добавить сверху
+    //    {
+    //        ShowActualChunks(0, 1);
+    //    }
+    //    if (PosCurrentChunk.y < PosPrevChunk.y) // добавить снизу
+    //    {
+    //        ShowActualChunks(0, -1);
+    //    }
+    //}
 
-    private void ShowActualChunks(int dirx, int diry)
-    {
-        List<Chunk> newChunks = new List<Chunk>();
-        for (int i = -distLoad; i < distLoad + 1; i++)
-        {
-            bool existFlag = false;
-            for (int k = 0; k < map.Count; k++)
-            {
-                bool checkX = map[k].X == PosCurrentChunk.x + distLoad * dirx + i * diry;
-                bool checkY = map[k].Y == PosCurrentChunk.y + distLoad * diry + i * dirx;
-                if (checkX && checkY) // подгрузка уже существующего чанка
-                {
-                    existFlag = true;
-                    map[k].ChunkV.SetActive(true);
-                    activeMap.Add(map[k]);
-                    break;
-                }
-            }
-            if (!existFlag) // создание нового чанка
-            {
-                int x = (int)PosCurrentChunk.x + distLoad * dirx + i * diry;
-                int y = (int)PosCurrentChunk.y + distLoad * diry + i * dirx;
-                newChunks.Add(new Chunk(x, y, Instantiate(ChunkPref, transformMap)));
-            }
-            int x1 = (int)PosCurrentChunk.x - dirx - distLoad * dirx + i * diry;
-            int y1 = (int)PosCurrentChunk.y - diry - distLoad * diry + i * dirx;
-            DeactivateChunk(x1, y1);
-        }
+    //private void ShowActualChunks(int dirx, int diry)
+    //{
+    //    List<Chunk> newChunks = new List<Chunk>();
+    //    for (int i = -distLoad; i < distLoad + 1; i++)
+    //    {
+    //        bool existFlag = false;
+    //        for (int k = 0; k < map.Count; k++)
+    //        {
+    //            bool checkX = map[k].X == PosCurrentChunk.x + distLoad * dirx + i * diry;
+    //            bool checkY = map[k].Y == PosCurrentChunk.y + distLoad * diry + i * dirx;
+    //            if (checkX && checkY) // подгрузка уже существующего чанка
+    //            {
+    //                existFlag = true;
+    //                map[k].ChunkV.SetActive(true);
+    //                activeMap.Add(map[k]);
+    //                break;
+    //            }
+    //        }
+    //        if (!existFlag) // создание нового чанка
+    //        {
+    //            int x = (int)PosCurrentChunk.x + distLoad * dirx + i * diry;
+    //            int y = (int)PosCurrentChunk.y + distLoad * diry + i * dirx;
+    //            newChunks.Add(new Chunk(x, y, Instantiate(ChunkPref, transformMap)));
+    //        }
+    //        int x1 = (int)PosCurrentChunk.x - dirx - distLoad * dirx + i * diry;
+    //        int y1 = (int)PosCurrentChunk.y - diry - distLoad * diry + i * dirx;
+    //        DeactivateChunk(x1, y1);
+    //    }
 
-        map.AddRange(newChunks);
-        activeMap.AddRange(newChunks);
-        SetAndCreateCellsOnTheMap(newChunks);
-    }
+    //    map.AddRange(newChunks);
+    //    activeMap.AddRange(newChunks);
+    //    SetAndCreateCellsOnTheMap(newChunks);
+    //}
 
     private void DeactivateChunk(int x, int y)
     {
@@ -168,8 +163,9 @@ public class GenerateMap : MonoBehaviour
         }
     }
 
-    private void SetAndCreateCellsOnTheMap(List<Chunk> chunks)
+    public void SetAndCreateCellsOnTheMap(List<Chunk> chunks)
     {
+        map.AddRange(chunks);
         foreach (Chunk chunk in chunks)
         {
             perlinHeight = new MyPerlin(map, chunk.NodesHeight);
@@ -208,13 +204,13 @@ public class GenerateMap : MonoBehaviour
         foreach (var cell in chunk.Cells)
         {
             if (cell.Value < waterLevel)
-                cell.Type = water;
+                cell.Type = Water;
             else if (cell.Value < sandLevel)
-                cell.Type = sand;
+                cell.Type = Sand;
             else if (cell.Value < landLevel)
-                cell.Type = land;
+                cell.Type = Land;
             else
-                cell.Type = mountain;
+                cell.Type = Mountain;
         }
     }
 
@@ -225,14 +221,14 @@ public class GenerateMap : MonoBehaviour
         foreach (var cell in chunk.Cells)
         {
             float rnd = Random.value;
-            if ((rnd < cell.VegetationValue + densityTrees) && (cell.Type == land) && (cell.Vegetation == null))
-                cell.Vegetation = tree;
+            if ((rnd < cell.VegetationValue + densityTrees) && (cell.Type == Land) && (cell.Vegetation == null))
+                cell.Vegetation = Tree;
         }
         foreach (var cell in chunk.Cells)
         {
             float rnd = Random.value;
-            if ((rnd < densityGrass) && (cell.Type == land) && (cell.Vegetation == null))
-                cell.Vegetation = grass1;
+            if ((rnd < densityGrass) && (cell.Type == Land) && (cell.Vegetation == null))
+                cell.Vegetation = Grass;
         }
     }
 
@@ -248,12 +244,11 @@ public class GenerateMap : MonoBehaviour
 
     private void CreateStartChunks()
     {
-        transformMap = Map.transform;
         for (int i = 0; i < 2 * startCountChunks + 1; i++)
         {
             for (int j = 0; j < 2 * startCountChunks + 1; j++)
             {
-                Chunk newChunk = new Chunk(i, j, Instantiate(ChunkPref, transformMap));
+                Chunk newChunk = new Chunk(i, j, Instantiate(ChunkPref, transform));
                 map.Add(newChunk);
                 if ((i <= startCountChunks + distLoad) && (i >= startCountChunks - distLoad) &&
                     (j <= startCountChunks + distLoad) && (j >= startCountChunks - distLoad))

@@ -6,8 +6,9 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     public Camera cam;
-    public GameObject player;
+    public GameObject entities;
 
+    private GameObject player;
     private int scrollSpeed = 10;
     public float camMin = 3;
     public float camMax = 10;
@@ -16,7 +17,7 @@ public class CameraMovement : MonoBehaviour
 
     void Start()
     {
-
+        player = entities.GetComponent<CreatePlayer>().player;
     }
 
     void Update()

@@ -13,6 +13,7 @@ namespace Assets.Classes.Animals
         {
             Count++;
         }
+        
         protected override void Movement()
         {
 

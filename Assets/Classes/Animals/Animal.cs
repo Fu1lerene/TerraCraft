@@ -4,12 +4,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Classes.Animals
 {
-    internal class Animal
+    public class Animal
     {
         public float X { get; set; }
         public float Y { get; set; }

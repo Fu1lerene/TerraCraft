@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 4739534452675089742}
   - component: {fileID: 529110251384180439}
   - component: {fileID: -6782632621546857107}
+  - component: {fileID: -3179336961661826513}
+  - component: {fileID: 4510394242111458143}
   m_Layer: 0
   m_Name: Sheep
-  m_TagString: Untagged
+  m_TagString: Sheep
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,3 +174,32 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8914286, y: 0.8914286}
   m_EdgeRadius: 0
+--- !u!114 &-3179336961661826513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3567856491832164473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e58f1b37f01824d4ebd12130624e85f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HP: 100
+  Speed: 1
+  Damage: 10
+  AnimalObj: {fileID: 3567856491832164473}
+--- !u!114 &4510394242111458143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3567856491832164473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14c1c25e374c9b34a99ba322e7914c8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnimalObj: {fileID: 0}
