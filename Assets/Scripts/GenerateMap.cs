@@ -28,33 +28,33 @@ public class GenerateMap : MonoBehaviour
 
     private List<Chunk> map = new List<Chunk>();
     public List<Chunk> activeMap = new List<Chunk>();
-    public Vector2 currentChunk = new Vector2();
-    private Vector2 prevChunk = new Vector2();
+    public Vector2 PosCurrentChunk { get; set; }
+    public Vector2 PosPrevChunk { get; set; }
 
     private Transform transformMap;
-    private int sizeCh = GenerateParams.SizeChunk;
     private int distLoad = GenerateParams.LoadingDistance;
     private MyPerlin perlinHeight;
     private MyPerlin perlinTrees;
-    private NodeVectors nodeVect;
     private int startCountChunks = GenerateParams.StartCountChunks;
     private float waterLevel = 0.3f;
     private float sandLevel = 0.35f;
     private float landLevel = 0.8f;
     //private float landLevel = 0.8f;
-    
 
-    void Start()
+    private void Awake()
     {
         CreateStartChunks();
         SetAndCreateCellsOnTheMap(map);
-        currentChunk = new Vector2(Mathf.Floor(player.transform.position.x / sizeCh),
-                               Mathf.Floor(player.transform.position.y / sizeCh));
+    }
+
+    void Start()
+    {
+
     }
 
     private void Update()
     {
-        LoadAndShowActualChunks();
+
     }
 
     private void RandomColoringCells(Chunk chunk)
@@ -75,7 +75,7 @@ public class GenerateMap : MonoBehaviour
             }
             if (chunk.Cells[i].Type == sand)
             {
-                float deep = chunk.Cells[i].Value * 0.1f;
+                //float deep = chunk.Cells[i].Value * 0.1f;
                 spr.color = new UnityEngine.Color(0.93f, 0.89f, 0.42f + clr, 1);
             }
             if (chunk.Cells[i].Type == mountain)
@@ -102,26 +102,21 @@ public class GenerateMap : MonoBehaviour
         }
     }
 
-    private void LoadAndShowActualChunks()
+    public void LoadAndShowActualChunks()
     {
-        prevChunk = currentChunk;
-        currentChunk = new Vector2(Mathf.Floor(player.transform.position.x / sizeCh),
-                                   Mathf.Floor(player.transform.position.y / sizeCh));
-
-        if (currentChunk.x > prevChunk.x) // добавить справа 
+        if (PosCurrentChunk.x > PosPrevChunk.x) // добавить справа 
         {
             ShowActualChunks(1, 0);
-            
         }
-        if (currentChunk.x < prevChunk.x) // добавить слева
+        if (PosCurrentChunk.x < PosPrevChunk.x) // добавить слева
         {
             ShowActualChunks(-1, 0);
         }
-        if (currentChunk.y > prevChunk.y) // добавить сверху
+        if (PosCurrentChunk.y > PosPrevChunk.y) // добавить сверху
         {
             ShowActualChunks(0, 1);
         }
-        if (currentChunk.y < prevChunk.y) // добавить снизу
+        if (PosCurrentChunk.y < PosPrevChunk.y) // добавить снизу
         {
             ShowActualChunks(0, -1);
         }
@@ -135,8 +130,8 @@ public class GenerateMap : MonoBehaviour
             bool existFlag = false;
             for (int k = 0; k < map.Count; k++)
             {
-                bool checkX = map[k].X == currentChunk.x + distLoad * dirx + i * diry;
-                bool checkY = map[k].Y == currentChunk.y + distLoad * diry + i * dirx;
+                bool checkX = map[k].X == PosCurrentChunk.x + distLoad * dirx + i * diry;
+                bool checkY = map[k].Y == PosCurrentChunk.y + distLoad * diry + i * dirx;
                 if (checkX && checkY) // подгрузка уже существующего чанка
                 {
                     existFlag = true;
@@ -147,12 +142,12 @@ public class GenerateMap : MonoBehaviour
             }
             if (!existFlag) // создание нового чанка
             {
-                int x = (int)currentChunk.x + distLoad * dirx + i * diry;
-                int y = (int)currentChunk.y + distLoad * diry + i * dirx;
+                int x = (int)PosCurrentChunk.x + distLoad * dirx + i * diry;
+                int y = (int)PosCurrentChunk.y + distLoad * diry + i * dirx;
                 newChunks.Add(new Chunk(x, y, Instantiate(ChunkPref, transformMap)));
             }
-            int x1 = (int)currentChunk.x - dirx - distLoad * dirx + i * diry;
-            int y1 = (int)currentChunk.y - diry - distLoad * diry + i * dirx;
+            int x1 = (int)PosCurrentChunk.x - dirx - distLoad * dirx + i * diry;
+            int y1 = (int)PosCurrentChunk.y - diry - distLoad * diry + i * dirx;
             DeactivateChunk(x1, y1);
         }
 

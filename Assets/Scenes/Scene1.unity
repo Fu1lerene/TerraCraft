@@ -136,6 +136,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -6708369379820898933, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
+      propertyPath: entities
+      value: 
+      objectReference: {fileID: 1357481685}
+    - target: {fileID: -6708369379820898933, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
       propertyPath: StaminaSlider
       value: 
       objectReference: {fileID: 969770477}
@@ -155,6 +159,10 @@ PrefabInstance:
       propertyPath: HPSlider
       value: 
       objectReference: {fileID: 653252004}
+    - target: {fileID: 7161715316678818307, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
+      propertyPath: entities
+      value: 
+      objectReference: {fileID: 1357481685}
     - target: {fileID: 7161715316678818307, guid: ae8b1d400e0448d488c9f1982acac736, type: 3}
       propertyPath: MapObject
       value: 
@@ -1210,14 +1218,55 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3488009064825469960, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8283985511292667988, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1298864079}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3842416645708155326, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1357481687}
+    - targetCorrespondingSourceObject: {fileID: 3842416645708155326, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1357481686}
   m_SourcePrefab: {fileID: 100100000, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
+--- !u!1 &1357481685 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3842416645708155326, guid: e1fdfe756d7645a4fad154224d08a0ef, type: 3}
+  m_PrefabInstance: {fileID: 1357481684}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1357481686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357481685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f1bb731d01b24646b34f2f662b028cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sheep: {fileID: 3567856491832164473, guid: a5eb38f26fbe6c140a92f13d52d6bf19, type: 3}
+  map: {fileID: 262379301}
+  entities: {fileID: 1357481685}
+  land: {fileID: 993100588336077604, guid: c14ea4708d90f9a43835d16b98f34c7b, type: 3}
+--- !u!114 &1357481687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357481685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3fa2e75da2f04345892979053456b2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1298864078}
 --- !u!1 &1362044168
 GameObject:
   m_ObjectHideFlags: 0
@@ -1365,6 +1414,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1912751764}
   m_CullTransparentMesh: 1
+--- !u!1 &2000258803
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2000258805}
+  - component: {fileID: 2000258804}
+  m_Layer: 0
+  m_Name: Abstracr Watcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2000258804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000258803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3935567efbdee9b448e7691e5e9c4d0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  entities: {fileID: 1357481685}
+  Map: {fileID: 262379301}
+--- !u!4 &2000258805
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000258803}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.682852, y: -1.2188768, z: -4.9166403}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2080343495
 GameObject:
   m_ObjectHideFlags: 0
@@ -1568,3 +1663,4 @@ SceneRoots:
   - {fileID: 8169293599846783979}
   - {fileID: 1089045729894405241}
   - {fileID: 1065231255}
+  - {fileID: 2000258805}

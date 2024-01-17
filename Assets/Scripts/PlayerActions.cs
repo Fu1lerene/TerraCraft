@@ -15,6 +15,7 @@ public class PlayerActions : MonoBehaviour
     public Light lantern;
     public Slider StaminaSlider;
     public Slider HPSlider;
+    public GameObject entities;
 
     private bool lanternOn;
     public float intensityLight = 0.0f;
@@ -30,72 +31,90 @@ public class PlayerActions : MonoBehaviour
         lanternOn = false;
         lantern.intensity = 2.5f;
         lantern.range = 5.5f;
-        pl = player.GetComponent<PlayerMovement>().pl;
+        pl = entities.GetComponent<CreatePlayer>().pl;
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        SwitchLight();
         StaminaSlider.value = pl.Stamina.Value;
         HPSlider.value = pl.HP;
         activeMap = MapObject.GetComponent<GenerateMap>().activeMap;
 
         //Debug.Log(activeMap.Count);
         //Debug.Log(activeMap[0].X);
-        GetThisCell();
+        currentCell = GetThisCell();
         ActionsFromKey();
     }
 
-    private void GetThisCell()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        currentPos = MapObject.GetComponent<GenerateMap>().currentChunk;
+        pl.HP -= 10;
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        
+    }
+
+    private Cell GetThisCell()
+    {
+        currentPos = MapObject.GetComponent<GenerateMap>().PosCurrentChunk;
         foreach (Chunk chunk in activeMap)
         {
-            if (chunk.X == currentPos.x && (chunk.Y == currentPos.y))
+            if (chunk.X == currentPos.x && chunk.Y == currentPos.y)
             {
                 currentChunk = chunk;
                 foreach (Cell cell in currentChunk.Cells)
                 {
-                    if (((int)cell.X == (int)(player.transform.position.x + 0.5f)) && ((int)cell.Y == (int)(player.transform.position.y + 0.5f)))
+                    float x = Mathf.Floor(player.transform.position.x + 0.5f);
+                    float y = Mathf.Floor(player.transform.position.y + 0.5f);
+                    if (cell.X == x && cell.Y == y)
                     {
-                        currentCell = cell;
-                        break;
+                        return cell;
                     }
                 }
                 break;
             }
         }
-    }
-
-    private void SwitchLight()
-    {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            lanternOn = !lanternOn;
-            if (lanternOn)
-            {
-                lantern.intensity += intensityLight;
-                lantern.range += radiusLight;
-            }
-            else
-            {
-                lantern.intensity -= intensityLight;
-                lantern.range -= radiusLight;
-            }
-        }
+        return null;
     }
 
     private void ActionsFromKey()
     {
-        if (Input.GetKeyDown(KeyCode.R)) 
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            if (currentCell.Vegetation != null)
-            {
-                currentCell.Vegetation = null;
-                Destroy(currentCell.VegetationObject);
-            }
+            SwitchLight();
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            DestroyVegetation();
+        }
+    }
+    private void SwitchLight()
+    {
+        lanternOn = !lanternOn;
+        if (lanternOn)
+        {
+            lantern.intensity += intensityLight;
+            lantern.range += radiusLight;
+        }
+        else
+        {
+            lantern.intensity -= intensityLight;
+            lantern.range -= radiusLight;
+        }
+    }
+    private void DestroyVegetation()
+    {
+        if (currentCell.Vegetation != null)
+        {
+            currentCell.Vegetation = null;
+            Destroy(currentCell.VegetationObject);
         }
     }
 }

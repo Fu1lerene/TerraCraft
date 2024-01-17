@@ -18,7 +18,6 @@ namespace Assets.Classes
 
         private List<List<Vector2>> nodesGrid;
 
-
         public MyPerlin(List<Chunk> map, List<List<Vector2>> nodesGrid)
         {
             this.map = map;
@@ -52,7 +51,6 @@ namespace Assets.Classes
                 noiseValues = ChangeValuesByWorldType(currentChunk, noiseValues);
             return NormalizeNoise(currentChunk, noiseValues);
         }
-
         private List<float> ChangeValuesByWorldType(Chunk chunk, List<float> values)
         {
             float minValue = -2;
@@ -94,7 +92,6 @@ namespace Assets.Classes
             }
             return values;
         }
-
         private List<float> NormalizeNoise(Chunk chunk, List<float> values)
         {
             float minParam = -0.75f;
@@ -109,7 +106,6 @@ namespace Assets.Classes
             }
             return values;
         }
-
         private void SetNoiseValueOnOctave(Chunk currentChunk, List<List<float>> octaveValues, int k, int countNodes, int sizeSquareOctave)
         {
             octaveValues.Add(new List<float>());
@@ -154,12 +150,10 @@ namespace Assets.Classes
                 octaveValues[k].Add(res3);
             }
         }
-
         private float Lerp(float a, float b, float t)
         {
             return a + (b - a) * t;
         }
-
         public List<float> SmoothingNoise(List<float> oldValues)
         {
             List<float> newValues = new List<float>();
@@ -227,7 +221,6 @@ namespace Assets.Classes
             }
             return newValues;
         }
-
         public void SetNodes(Chunk currentChunk)
         {
             SetAllNodesForNodes(currentChunk);
@@ -251,7 +244,6 @@ namespace Assets.Classes
                 }
             }
         }
-
         private Vector2 GetRandomVector()
         {
             float x1 = (float)(2 * Random.value - 1);
@@ -259,7 +251,6 @@ namespace Assets.Classes
 
             return new Vector2(x1 / Mathf.Sqrt(x1 * x1 + x2 * x2), x2 / Mathf.Sqrt(x1 * x1 + x2 * x2));
         }
-
         private void SetSomeBoundNodes(Chunk currentChunk)
         {
             foreach (var otherChunk in map)
@@ -286,7 +277,6 @@ namespace Assets.Classes
 
             }
         }
-
         private void BindChunks(Chunk otherChunk, Chunk currentChunk, string side)
         {
             for (int k = 0; k < countOct; k++)
@@ -329,7 +319,6 @@ namespace Assets.Classes
                 }
             }
         }
-
         private bool IsFindedChunk(Chunk otherChunk, Chunk currentChunk, string where)
         {
             if (otherChunk.NodesHeight[0][0] != new Vector2())
@@ -349,121 +338,5 @@ namespace Assets.Classes
             }
             return false;
         }
-
-        //private void SetAllNodesForNodesType(Chunk currentChunk)
-        //{
-        //    SetSomeBoundNodes(currentChunk);
-        //    for (int nodeType = 0; nodeType < 2; nodeType++)
-        //    {
-        //        for (int k = 0; k < countOct; k++)
-        //        {
-        //            int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
-
-        //            for (int i = 0; i < countAllNodes; i++)
-        //            {
-        //                if (currentChunk.Nodes[k][i] == new Vector2(0, 0))
-        //                {
-        //                    currentChunk.Nodes[k][i] = GetRandomVector();
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private Vector2 GetRandomVector()
-        //{
-        //    float x1 = (float)(2 * Random.value - 1);
-        //    float x2 = (float)(2 * Random.value - 1);
-
-        //    return new Vector2(x1 / Mathf.Sqrt(x1 * x1 + x2 * x2), x2 / Mathf.Sqrt(x1 * x1 + x2 * x2));
-        //}
-
-        //private void SetSomeBoundNodes(Chunk currentChunk)
-        //{
-        //    foreach(var otherChunk in map)
-        //    {
-        //        for (int i = 0; i < 2; i++) // проход по типам узлов
-        //        {
-        //            if (IsFindedChunk(otherChunk, currentChunk, "right")) // найден чанк справа
-        //            {
-        //                BindChunks(otherChunk, currentChunk, "right");
-        //            }
-        //            if (IsFindedChunk(otherChunk, currentChunk, "left")) // найден чанк слева
-        //            {
-        //                BindChunks(otherChunk, currentChunk, "left");
-        //            }
-        //            if (IsFindedChunk(otherChunk, currentChunk, "top")) // найден чанк сверху
-        //            {
-        //                BindChunks(otherChunk, currentChunk, "top");
-        //            }
-        //            if (IsFindedChunk(otherChunk, currentChunk, "bottom")) // найден чанк снизу
-        //            {
-        //                BindChunks(otherChunk, currentChunk, "bottom");
-        //            }
-        //        }
-
-        //    }
-        //}
-
-        //private void BindChunks(Chunk otherChunk, Chunk currentChunk, string side)
-        //{
-        //    for (int k = 0; k < countOct; k++)
-        //    {
-        //        countNodes = (int)Mathf.Pow(2, k) + 1;
-        //        for (int i = 0; i < countNodes; i++)
-        //        {
-        //            //Vector2 randomVector = new Vector2(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f));
-        //            int indexrl = 0;
-        //            int indextb1 = 0;
-        //            int indextb2 = 0;
-        //            switch (side)
-        //            {
-        //                case "right":
-        //                    indexrl = (countNodes - 1) * countNodes + i;
-        //                    currentChunk.Nodes[k][indexrl] = otherChunk.Nodes[k][i];
-        //                    break;
-        //                case "left":
-        //                    indexrl = (countNodes - 1) * countNodes + i;
-        //                    currentChunk.Nodes[k][i] = otherChunk.Nodes[k][indexrl];
-        //                    break;
-        //                case "top":
-        //                    indextb1 = (i + 1) * countNodes - 1;
-        //                    indextb2 = i * countNodes;
-        //                    currentChunk.Nodes[k][indextb1] = otherChunk.Nodes[k][indextb2];
-        //                    break;
-        //                case "bottom":
-        //                    indextb1 = (i + 1) * countNodes - 1;
-        //                    indextb2 = i * countNodes;
-        //                    currentChunk.Nodes[k][indextb2] = otherChunk.Nodes[k][indextb1];
-        //                    break;
-        //                default:
-        //                    Debug.Log("Ошибка");
-        //                    break;
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private bool IsFindedChunk(Chunk otherChunk, Chunk currentChunk, string where)
-        //{
-        //    if (otherChunk.Nodes[0][0] != new Vector2())
-        //    {
-        //        switch (where)
-        //        {
-        //            case "right":
-        //                return (otherChunk.X == currentChunk.X + 1) && (otherChunk.Y == currentChunk.Y);
-        //            case "left":
-        //                return (otherChunk.X == currentChunk.X - 1) && (otherChunk.Y == currentChunk.Y);
-        //            case "top":
-        //                return (otherChunk.X == currentChunk.X) && (otherChunk.Y == currentChunk.Y + 1);
-        //            case "bottom":
-        //                return (otherChunk.X == currentChunk.X) && (otherChunk.Y == currentChunk.Y - 1);
-        //            default: return false;
-        //        }
-        //    }
-        //    return false;
-        //}
-
-
     }
 }

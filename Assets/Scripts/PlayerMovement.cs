@@ -12,31 +12,22 @@ using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public GameObject player;
+    public GameObject entities;
+    
+    private bool isRunning = false;
     private float moveHorizontal;
     private float moveVertical;
     private Vector3 movement;
-    private int sizeCh = GenerateParams.SizeChunk;
-    private int distLoad = GenerateParams.LoadingDistance;
-    private int startCountChunks = GenerateParams.StartCountChunks;
     private SpriteRenderer sr;
-    public Player pl = new Player();
+    private Player pl;
     private float multSpeed = 1.0f;
 
-
-    public GameObject player;
-    public float speed = 2f;
-    public float costRateStamina = 0.5f;
-    bool isRunning = false;
-
-    private void Awake()
-    {
-        player.transform.position = new Vector3((2 * startCountChunks + 1) * sizeCh / 2,
-                                        (2 * startCountChunks + 1) * sizeCh / 2, 0);
-    }
 
     void Start()
     {
         sr = player.GetComponent<SpriteRenderer>();
+        pl = entities.GetComponent<CreatePlayer>().pl;
     }
     void Update()
     {
@@ -93,6 +84,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         player.transform.Translate(movement); /// Перемещение
+
+        pl.X = player.transform.position.x;
+        pl.Y = player.transform.position.y;
     }
 
     private Vector3 GetMovement(float multSpeed)

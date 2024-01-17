@@ -12,11 +12,11 @@ namespace Assets.Classes
         public static int SizeChunk = 32;
         public static int LoadingDistance = 3;
         public static int CountOctaves = 3;
-        public static int StartCountChunks = 7;
+        public static int StartCountChunks = 5;
 
         public static float DensityForest = - 0.4f;
         public static float DensityGrass = 0.01f;
 
-        public static string WorldType = "default"; // default, island, line, circles
+        public static string WorldType = "circles"; // default, island, line, circles
     }
 }
