@@ -35,6 +35,8 @@ public class GenerateMap : MonoBehaviour
     private float sandLevel = 0.35f;
     private float landLevel = 0.8f;
     //private float landLevel = 0.8f;
+    private bool isStart = false;
+    private int sizeCh = GenerateParams.SizeChunk;
 
     private void Awake()
     {
@@ -43,8 +45,7 @@ public class GenerateMap : MonoBehaviour
 
     void Start()
     {
-        CreateStartChunks();
-        SetAndCreateCellsOnTheMap(map);
+
     }
 
     private void Update()
@@ -165,7 +166,9 @@ public class GenerateMap : MonoBehaviour
 
     public void SetAndCreateCellsOnTheMap(List<Chunk> chunks)
     {
-        map.AddRange(chunks);
+        if (isStart)
+            map.AddRange(chunks);
+        else isStart = true;
         foreach (Chunk chunk in chunks)
         {
             perlinHeight = new MyPerlin(map, chunk.NodesHeight);
@@ -187,6 +190,7 @@ public class GenerateMap : MonoBehaviour
             CreateVegetationsOnCells(chunk);
             RandomColorAndSizeTrees(chunk);
         }
+
     }
 
     private static void CreateCellsOnTheMap(Chunk chunk)
@@ -242,13 +246,13 @@ public class GenerateMap : MonoBehaviour
         }
     }
 
-    private void CreateStartChunks()
+    public void CreateStartChunks()
     {
         for (int i = 0; i < 2 * startCountChunks + 1; i++)
         {
             for (int j = 0; j < 2 * startCountChunks + 1; j++)
             {
-                Chunk newChunk = new Chunk(i, j, Instantiate(ChunkPref, transform));
+                Chunk newChunk = new Chunk(i, j, Instantiate(ChunkPref, new Vector3(i * sizeCh, j * sizeCh, 0), Quaternion.identity, transform));
                 map.Add(newChunk);
                 if ((i <= startCountChunks + distLoad) && (i >= startCountChunks - distLoad) &&
                     (j <= startCountChunks + distLoad) && (j >= startCountChunks - distLoad))

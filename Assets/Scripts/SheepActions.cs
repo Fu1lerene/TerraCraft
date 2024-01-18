@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.Classes.Animals;
 
 public class SheepActions : MonoBehaviour
 {
     public GameObject SheepObj;
 
-    private List<Animal> sheeps;
+    private List<GameObject> sheeps;
+    private AnimalStats anSt;
     // Start is called before the first frame update
     void Start()
     {
-        
+        anSt = GetComponent<AnimalStats>();
     }
 
     // Update is called once per frame
@@ -27,13 +27,13 @@ public class SheepActions : MonoBehaviour
         {
             foreach (var sheep in sheeps)
             {
-                if (sheep.AnimalObj == SheepObj)
+                if (sheep == SheepObj)
                 {
                     PlayerStats plSt = collision.gameObject.GetComponent<PlayerStats>();
-                    sheep.HP -= plSt.Damage;
-                    if (sheep.HP <= 0)
+                    anSt.HP -= plSt.Damage;
+                    if (anSt.HP <= 0)
                     {
-                        Destroy(sheep.AnimalObj);
+                        Destroy(sheep);
                         sheeps.Remove(sheep);
                     }
                     break;

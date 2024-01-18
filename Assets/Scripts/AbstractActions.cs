@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Classes.Player;
 using Assets.Classes;
-using Assets.Classes.Animals;
 
 public class AbstractActions : MonoBehaviour
 {
@@ -13,8 +12,7 @@ public class AbstractActions : MonoBehaviour
 
     private GameObject player;
     private List<Chunk> activeMap;
-    private List<Animal> activeSheeps;
-    private List<Animal> sheeps;
+    private List<GameObject> sheeps;
     private Vector2 posCurrentChunk;
     private Vector2 posPrevChunk;
     private int sizeCh = GenerateParams.SizeChunk; 
@@ -29,7 +27,9 @@ public class AbstractActions : MonoBehaviour
         posCurrentChunk = new Vector2(Mathf.Floor((player.transform.position.x + 0.5f) / sizeCh),
                             Mathf.Floor((player.transform.position.y + 0.5f) / sizeCh));
 
-
+        genMap.CreateStartChunks();
+        map = genMap.map;
+        genMap.SetAndCreateCellsOnTheMap(map);
 
         genAn.SpawnAnimals(map);
     }
@@ -39,9 +39,7 @@ public class AbstractActions : MonoBehaviour
         player = Entities.GetComponent<CreatePlayer>().player;
         genAn = Entities.GetComponent<GenerateAnimals>();
         genMap = Map.GetComponent<GenerateMap>();
-        activeSheeps = genAn.activeSheeps;
         activeMap = genMap.activeMap;
-        map = genMap.map;
         sheeps = genAn.sheeps;
     }
 
@@ -115,7 +113,6 @@ public class AbstractActions : MonoBehaviour
         LoadObjects(loadChunks);
         CreateObjects(newChunks);
         DeactivateObjects(oldChunks);
-        Debug.Log(activeMap.Count);
     }
     private void DeactivateObjects(List<Chunk> chunks)
     {
@@ -124,21 +121,6 @@ public class AbstractActions : MonoBehaviour
             chunk.ChunkV.SetActive(false);
             activeMap.Remove(chunk);
 
-            List<Animal> oldSheeps = new List<Animal>();
-            float xmin = chunk.Cells[0].X;
-            float xmax = chunk.Cells[chunk.Cells.Count - 1].X;
-            float ymin = chunk.Cells[0].Y;
-            float ymax = chunk.Cells[chunk.Cells.Count - 1].Y;
-            foreach (var sheep in activeSheeps)
-            {
-                bool checkX = sheep.X >= xmin && sheep.X <= xmax;
-                bool checkY = sheep.Y >= ymin && sheep.Y <= ymax;
-                if (checkX && checkY)
-                {
-                    sheep.AnimalObj.SetActive(false);
-                    oldSheeps.Add(sheep);
-                }
-            }
             /*
              удалить из activeSheeps
              

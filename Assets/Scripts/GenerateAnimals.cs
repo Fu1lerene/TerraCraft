@@ -1,5 +1,4 @@
 using Assets.Classes;
-using Assets.Classes.Animals;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,8 +9,7 @@ public class GenerateAnimals : MonoBehaviour
     public GameObject Map;
     public GameObject Land;
 
-    public List<Animal> sheeps = new List<Animal>();
-    public List<Animal> activeSheeps = new List<Animal>();
+    public List<GameObject> sheeps = new List<GameObject>();
     private int sizeCh = GenerateParams.SizeChunk;
 
 
@@ -24,7 +22,6 @@ public class GenerateAnimals : MonoBehaviour
     {
         foreach (var chunk in chunks)
         {
-            List<Animal> newSheeps = new List<Animal>();
             int count = 0;
             foreach (var cell in chunk.Cells) /// Количество допустимых клеток
             {
@@ -44,7 +41,7 @@ public class GenerateAnimals : MonoBehaviour
                     {
                         if (cell.Type == Land)
                         {
-                            newSheeps.Add(new Sheep(x, y));
+                            sheeps.Add(Instantiate(Sheep, new Vector3(x, y, 0), Quaternion.identity, transform));
                             break;
                         }
                         else
@@ -55,10 +52,6 @@ public class GenerateAnimals : MonoBehaviour
                     }
                 }
             }
-            sheeps.AddRange(newSheeps);
-            foreach (var sh in newSheeps)
-                sh.AnimalObj = Instantiate(Sheep, new Vector3(sh.X, sh.Y, 0), Quaternion.identity, transform);
-            activeSheeps.AddRange(newSheeps);
         }
     }
 

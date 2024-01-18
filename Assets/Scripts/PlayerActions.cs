@@ -52,6 +52,10 @@ public class PlayerActions : MonoBehaviour
                 gameObject.SetActive(false);
             }
         }
+        if (collision.tag == "Chunk")
+        {
+            Debug.Log("chunk");
+        }
         
     }
 
