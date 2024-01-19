@@ -18,42 +18,42 @@ public class GenerateAnimals : MonoBehaviour
 
     }
 
-    public void SpawnAnimals(List<Chunk> chunks)
-    {
-        foreach (var chunk in chunks)
-        {
-            int count = 0;
-            foreach (var cell in chunk.Cells) /// Количество допустимых клеток
-            {
-                if (cell.Type == Land)
-                    count++;
-            }
+    //public void SpawnAnimals(List<Chunk> chunks)
+    //{
+    //    foreach (var chunk in chunks)
+    //    {
+    //        int count = 0;
+    //        foreach (var cell in chunk.Cells) /// Количество допустимых клеток
+    //        {
+    //            if (cell.Type == Land)
+    //                count++;
+    //        }
 
-            float dolya = (float)count / (sizeCh * sizeCh);
+    //        float dolya = (float)count / (sizeCh * sizeCh);
 
-            for (int i = 0; i < 5 * dolya; i++)
-            {
-                float x = Mathf.Floor(chunk.X * sizeCh + Random.Range(0, sizeCh - 1));
-                float y = Mathf.Floor(chunk.Y * sizeCh + Random.Range(0, sizeCh - 1));
-                foreach (var cell in chunk.Cells)
-                {
-                    if (cell.X == x && cell.Y == y)
-                    {
-                        if (cell.Type == Land)
-                        {
-                            sheeps.Add(Instantiate(Sheep, new Vector3(x, y, 0), Quaternion.identity, transform));
-                            break;
-                        }
-                        else
-                        {
-                            i--;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //        for (int i = 0; i < 5 * dolya; i++)
+    //        {
+    //            float x = Mathf.Floor(chunk.X * sizeCh + Random.Range(0, sizeCh - 1));
+    //            float y = Mathf.Floor(chunk.Y * sizeCh + Random.Range(0, sizeCh - 1));
+    //            foreach (var cell in chunk.Cells)
+    //            {
+    //                if (cell.X == x && cell.Y == y)
+    //                {
+    //                    if (cell.Type == Land)
+    //                    {
+    //                        sheeps.Add(Instantiate(Sheep, new Vector3(x, y, 0), Quaternion.identity, transform));
+    //                        break;
+    //                    }
+    //                    else
+    //                    {
+    //                        i--;
+    //                        break;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     void Update()
     {

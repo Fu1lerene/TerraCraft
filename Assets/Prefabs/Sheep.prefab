@@ -110,7 +110,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3567856491832164473}
-  m_BodyType: 0
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -189,7 +189,6 @@ MonoBehaviour:
   HP: 100
   Speed: 1
   Damage: 10
-  AnimalObj: {fileID: 3567856491832164473}
 --- !u!114 &4510394242111458143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,4 +201,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14c1c25e374c9b34a99ba322e7914c8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AnimalObj: {fileID: 0}

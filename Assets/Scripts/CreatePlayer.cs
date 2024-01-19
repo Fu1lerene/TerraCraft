@@ -12,8 +12,8 @@ public class CreatePlayer : MonoBehaviour
     public GameObject player;
     void Start()
     {
-        float x = (2 * startCountChunks + 1) * sizeCh / 2;
-        float y = (2 * startCountChunks + 1) * sizeCh / 2;
+        float x = (2 * startCountChunks + 1) * sizeCh / 2 - sizeCh / 2;
+        float y = (2 * startCountChunks + 1) * sizeCh / 2 -  sizeCh / 2;
         player = Instantiate(player, new Vector3(x, y, 0), Quaternion.identity, transform);
     }
 

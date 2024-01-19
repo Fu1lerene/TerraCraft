@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7343463445707728205}
   - component: {fileID: 8352538945018601416}
   - component: {fileID: 1069161859006185315}
+  - component: {fileID: 8736857909591580351}
   m_Layer: 0
   m_Name: Chunk
   m_TagString: Chunk
@@ -65,7 +66,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 15.5, y: 15.5}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -105,3 +106,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8736857909591580351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3601361822498451631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1b0ea83cb68104d8fddcbbdfea59d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Land: {fileID: 993100588336077604, guid: c14ea4708d90f9a43835d16b98f34c7b, type: 3}
+  Water: {fileID: 7597593461656029217, guid: 3f32a83915a47ef45bdc0bd2b13d4e08, type: 3}
+  Sand: {fileID: 162724424844935367, guid: fd34ce3d5cdb5524c89070b4e3c180e8, type: 3}
+  Mountain: {fileID: 6113921178023296319, guid: 40d0083f2161e1c4c9eb30f2c246a67d, type: 3}
+  ID: 0
+  cells: []
+  noiseValuesHeight: []

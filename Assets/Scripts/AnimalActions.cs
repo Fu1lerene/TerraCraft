@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SheepActions : MonoBehaviour
+public class AnimalActions : MonoBehaviour
 {
     public GameObject SheepObj;
 
