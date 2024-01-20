@@ -9,7 +9,6 @@ public class DayTimer : MonoBehaviour
     private float ml = 0.1f;
     private float dl = 0.5f;
     private float el = 0.6f;
-    //private float nl = 1f;
     private float t;
     private string dayPhase;
 
@@ -17,7 +16,7 @@ public class DayTimer : MonoBehaviour
 
     void Start()
     {
-        t = 0f;
+        t = 0.1f;
     }
 
     // Update is called once per frame

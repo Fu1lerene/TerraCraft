@@ -18,11 +18,13 @@ public class PlayerActions : MonoBehaviour
 
     private PlayerStats plSt;
     private bool lanternOn;
-    private Vector2 currentPos;
+
     void Start()
     {
         MapObject = GetComponentInParent<GenerateAnimals>().Map;
         plSt = GetComponent<PlayerStats>();
+        BoxCollider2D boxColl = gameObject.GetComponent<BoxCollider2D>();
+        CircleCollider2D circleColl = gameObject.GetComponent<CircleCollider2D>();
         lanternOn = false;
         lantern.intensity = 2f;
         lantern.range = 5.5f;
@@ -36,24 +38,27 @@ public class PlayerActions : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Sheep")
+        if (true)
         {
-            AnimalStats anSt = collision.gameObject.GetComponent<AnimalStats>();
-            plSt.Hp -= anSt.Damage;
-            if (plSt.Hp <= 0)
+            if (collision.tag == "Sheep")
             {
-                gameObject.SetActive(false);
+                AnimalStats anSt = collision.gameObject.GetComponent<AnimalStats>();
+                plSt.Hp -= anSt.Damage;
+                if (plSt.Hp <= 0)
+                {
+                    gameObject.SetActive(false);
+                }
+            }
+            if (collision.tag == "Chunk")
+            {
+
+            }
+            if (collision.tag == "Cell")
+            {
+                Debug.Log($"cell {collision.transform.position}");
             }
         }
-        if (collision.tag == "Chunk")
-        {
-            
-        }
-        if (collision.tag == "Cell")
-        {
-            Debug.Log($"cell {collision.transform.position}");
-        }
-        
+
     }
 
 

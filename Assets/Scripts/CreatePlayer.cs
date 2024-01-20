@@ -10,7 +10,7 @@ public class CreatePlayer : MonoBehaviour
     private int sizeCh = GenerateParams.SizeChunk;
 
     public GameObject player;
-    void Start()
+    void Awake()
     {
         float x = (2 * startCountChunks + 1) * sizeCh / 2 - sizeCh / 2;
         float y = (2 * startCountChunks + 1) * sizeCh / 2 -  sizeCh / 2;

@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8267652305187365253}
   - component: {fileID: 2734637219643738772}
-  - component: {fileID: 409169784330734307}
   - component: {fileID: 3575342373406518414}
+  - component: {fileID: 7615555582619180966}
   m_Layer: 0
   m_Name: Mountain
   m_TagString: Cell
@@ -86,8 +86,26 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &409169784330734307
-BoxCollider2D:
+--- !u!114 &3575342373406518414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6113921178023296319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b51345c3a7df3e43a48a5756e89fcc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ID: 0
+  valueHeight: 0
+  valueVegetation: 0
+  Tree: {fileID: 0}
+  Grass: {fileID: 0}
+  cellType: 0
+--- !u!58 &7615555582619180966
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -119,28 +137,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 0.01}
-  m_EdgeRadius: 0
---- !u!114 &3575342373406518414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6113921178023296319}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b51345c3a7df3e43a48a5756e89fcc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  value: 0
+  m_Radius: 0.0001

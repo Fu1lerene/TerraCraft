@@ -427,9 +427,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3935567efbdee9b448e7691e5e9c4d0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Map: {fileID: 412094301}
-  Entities: {fileID: 450601084}
-  Chunk: {fileID: 3601361822498451631, guid: 45f5279ef9695bf41a9bae2b7f6e780c, type: 3}
 --- !u!4 &2000258805
 Transform:
   m_ObjectHideFlags: 0

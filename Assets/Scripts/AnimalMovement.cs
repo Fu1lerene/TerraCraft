@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.ScrollRect;
 
 public class AnimalMovement : MonoBehaviour
 {
@@ -9,28 +10,29 @@ public class AnimalMovement : MonoBehaviour
     private SpriteRenderer sr;
     private float prevX;
     private float currX;
-    private Vector3 prevPos;
-    //private float timer;
-    //private float timerDelay;
-
     private float timerType;
     private float timerTypeDelay = 1f;
-    public string movementType;
-    public GameObject player;
-    private CreatePlayer crPl;
+    private GameObject player;
     private float eps = 2f;
+    private float multSpeed = 1.0f;
+
+    public MovementType movementType = MovementType.Stay;
+
+    public enum MovementType
+    {
+        Stay,
+        Wandering,
+        RunAway
+    }
 
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         anSt = GetComponent<AnimalStats>();
-        movementType = "stay";
 
-        crPl = transform.parent.gameObject.GetComponent<CreatePlayer>();
-        player = crPl.player;
+        player = GetComponentInParent<CreatePlayer>().player;
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         FlipSprite();
@@ -40,59 +42,66 @@ public class AnimalMovement : MonoBehaviour
     private void ChooseMovementTypeAndMoving()
     {
         timerType += Time.deltaTime;
-        if (timerType >= timerTypeDelay)
-        {
-            timerType = 0;
-            float r1 = Random.value;
-            if (movementType == "wandering")
-            {
-                timerTypeDelay = 1 + (2 * Random.value - 1); // время, которое овечка будет стоять на месте
-                movementType = "stay";
-                movement = new Vector3(0, 0, 0);
-            }
 
-            else if ((movementType == "stay") || (movementType == "run away"))
-            {
-                timerTypeDelay = 3 + (2 * Random.value - 1); // время, которое овечка будет идти в случайном направлении
-                movementType = "wandering";
-                float movX = Random.value * 2 - 1;
-                float movY = Random.value * 2 - 1;
-                float movNormX = movX / (Mathf.Sqrt(movX * movX + movY * movY));
-                float movNormY = movY / (Mathf.Sqrt(movX * movX + movY * movY));
-                movement = new Vector3(movNormX * anSt.Speed * Time.deltaTime, movNormY * anSt.Speed * Time.deltaTime, 0);
-            }
-        }
+        SetMovementStay();
 
-        if (Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y, 2)) < eps)
+        SetMovementWandering();
+
+        SetMovementRunAway();
+
+        transform.Translate(movement);
+
+    }
+
+    private void SetMovementRunAway()
+    {
+        float dx = Mathf.Pow(player.transform.position.x - transform.position.x, 2);
+        float dy = Mathf.Pow(player.transform.position.y - transform.position.y, 2);
+        if (Mathf.Sqrt(dx + dy) < eps)
         {
             timerType = 0;
             timerTypeDelay = 3;
-            //Debug.Log("Овца обкакалась от страха!");
-            movementType = "run away";
+            movementType = MovementType.RunAway;
+            multSpeed = 2;
+
             float movX = transform.position.x - player.transform.position.x;
             float movY = transform.position.y - player.transform.position.y;
-            float movNormX = movX / (Mathf.Sqrt(movX * movX + movY * movY));
-            float movNormY = movY / (Mathf.Sqrt(movX * movX + movY * movY));
-            movement = new Vector3(movNormX * 2 * anSt.Speed * Time.deltaTime, movNormY * 2 * anSt.Speed * Time.deltaTime, 0);
+            NormalizeMovement(movX, movY, out float movNormX, out float movNormY);
+            movement = new Vector3(movNormX, movNormY, 0) * multSpeed * anSt.Speed * Time.deltaTime;
         }
-
-        transform.Translate(movement);
-        
     }
 
-    private void WanderingMovementType()
+    private void SetMovementWandering()
     {
+        if (timerType >= timerTypeDelay && (movementType == MovementType.Stay || movementType == MovementType.RunAway))
+        {
+            timerType = 0;
+            timerTypeDelay = 3 + (2 * Random.value - 1); // время, которое овечка будет идти в случайном направлении
+            movementType = MovementType.Wandering;
+            multSpeed = 1;
 
+            float movX = Random.value * 2 - 1;
+            float movY = Random.value * 2 - 1;
+            NormalizeMovement(movX, movY, out float movNormX, out float movNormY);
+            movement = new Vector3(movNormX , movNormY, 0) * multSpeed * anSt.Speed * Time.deltaTime;
+        }
     }
 
-    private void StayMovementType()
+    private void NormalizeMovement(float movX, float movY, out float movNormX, out float movNormY)
     {
-        
+        movNormX = movX / Mathf.Sqrt(movX * movX + movY * movY);
+        movNormY = movY / Mathf.Sqrt(movX * movX + movY * movY);
     }
 
-    private void RunAwayMovementType()
+    private void SetMovementStay()
     {
-        //GameObject target = 
+        if (timerType >= timerTypeDelay && movementType == MovementType.Wandering)
+        {
+            timerType = 0;
+            timerTypeDelay = 1 + (2 * Random.value - 1); // время, которое овечка будет стоять на месте
+            movementType = MovementType.Stay;
+            movement = new Vector3(0, 0, 0);
+        }
     }
 
     private void FlipSprite()

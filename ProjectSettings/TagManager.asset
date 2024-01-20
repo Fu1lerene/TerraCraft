@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Sheep
   - Chunk
+  - Cell
+  - Weapon
   layers:
   - Default
   - TransparentFX

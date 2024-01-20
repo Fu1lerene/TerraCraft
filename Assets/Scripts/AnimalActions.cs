@@ -1,23 +1,26 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class AnimalActions : MonoBehaviour
 {
-    public GameObject SheepObj;
     public Slider SliderHP;
 
-    private List<GameObject> sheeps;
     private AnimalStats anSt;
     private AnimalMovement anMov;
+    private GenerateAnimals genAn;
+
     // Start is called before the first frame update
     void Start()
     {
         anSt = GetComponent<AnimalStats>();
         anMov = GetComponent<AnimalMovement>();
+        genAn = GetComponentInParent<GenerateAnimals>();
 
-        SliderHP = gameObject.transform.GetChild(0).GetChild(0).gameObject.GetComponent<Slider>();
+        SliderHP = GetComponentInChildren<Slider>();
         SliderHP.value = anSt.HP; // отображение здоровья овцы
         
     }
@@ -25,33 +28,41 @@ public class AnimalActions : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (anMov.movementType == "run away") // отображение интерфейса овцы
+        if (anMov.movementType == AnimalMovement.MovementType.RunAway) // отображение интерфейса овцы
             gameObject.transform.GetChild(0).gameObject.SetActive(true);
         else gameObject.transform.GetChild(0).gameObject.SetActive(false);
+
+        SliderHP.value = anSt.HP;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         GenerateAnimals genAn = GetComponentInParent<GenerateAnimals>();
-        if (collision.tag == "Player")
+        if (IsPlayer(collision))
         {
             foreach (var sheep in genAn.sheeps)
             {
-                if (sheep == SheepObj)
+                if (sheep == gameObject)
                 {
-                    PlayerStats plSt = collision.gameObject.GetComponent<PlayerStats>();
-                    
-                    anSt.HP -= plSt.Damage;
-                    Debug.Log(anSt.HP);
-                    SliderHP.value = anSt.HP;
-                    Debug.Log(SliderHP.value);
-                    if (anSt.HP <= 0)
-                    {
-                        Destroy(sheep);
-                        genAn.sheeps.Remove(sheep);
-                    }
                     break;
                 }
             }
         }
+    }
+
+    public void AnimalDead()
+    {
+        foreach (var sheep in genAn.sheeps)
+        {
+            if (sheep == gameObject)
+            {
+                Destroy(sheep);
+                genAn.sheeps.Remove(sheep);
+                break;
+            }
+        }
+    }
+    private bool IsPlayer(Collider2D collision)
+    {
+        return collision.tag == "Player" && collision.GetType() == typeof(BoxCollider2D);
     }
 }

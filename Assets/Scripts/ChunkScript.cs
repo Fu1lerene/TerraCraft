@@ -13,31 +13,41 @@ public class ChunkScript : MonoBehaviour
     public GameObject Sand;
     public GameObject Mountain;
     public GameObject Sheep;
-    
-
-    public Vector2[][] NodeVectorsHeight = new Vector2[GenerateParams.CountOctaves][];
-    public Vector2[][] NodeVectorsVegetation = new Vector2[GenerateParams.CountOctaves][];
     public int ID;
+
+    private Vector2[][] NodeVectorsHeight = new Vector2[GenerateParams.CountOctaves][];
+    private Vector2[][] NodeVectorsVegetation = new Vector2[GenerateParams.CountOctaves][];
+
     private static int _id;
     private int sizeCh = GenerateParams.SizeChunk;
     private GenerateMap genMap;
-    private GenerateAnimals genAn;
     private float x0;
     private float y0;
     private int countOct = GenerateParams.CountOctaves;
+    private List<GameObject> cells = new List<GameObject>();
+    private List<float> noiseValuesHeight;
+    private List<float> noiseValuesVegetation;
 
-
-    [SerializeField]
-    public List<GameObject> cells = new List<GameObject>();
-    public List<float> noiseValuesHeight;
-    public List<float> noiseValuesVegetation;
-    //public List<GameObject> sheeps;
     private float waterLevel = GenerateParams.WaterLevel;
     private float sandLevel = GenerateParams.SandLevel;
     private float landLevel = GenerateParams.LandLevel;
-    public bool startFlag = true;
+
+    public enum CellType
+    {
+        Land,
+        Water,
+        Sand,
+        Mountain
+    }
 
     void Start()
+    {
+        Initialization();
+
+        GenerateCellsWithNoise();
+    }
+
+    private void Initialization()
     {
         ID = ++_id;
         x0 = transform.position.x;
@@ -49,8 +59,6 @@ public class ChunkScript : MonoBehaviour
             NodeVectorsVegetation[k] = new Vector2[countAllNodes];
         }
         genMap = GetComponentInParent<GenerateMap>();
-        //Invoke("GenerateCellsWithNoise", 0.01f); // ÍÓÒÚ˚Î¸ #1 ŒŒŒŒ ƒ¿¿¿¿¿, Ã€ Œ“ Õ≈√Œ »«¡¿¬»À»—‹!!!
-        GenerateCellsWithNoise();
     }
 
     private void GenerateCellsWithNoise()
@@ -65,39 +73,70 @@ public class ChunkScript : MonoBehaviour
         MyPerlin perlinVegetation = new MyPerlin(NodeVectorsVegetation); // ¯ÛÏ ‰Îˇ ‰ÂÂ‚¸Â‚
         noiseValuesHeight = perlinHeight.GetNoiseValues(gameObject);
         noiseValuesVegetation = perlinVegetation.GetNoiseValues(gameObject);
+
         for (int i = 0; i < sizeCh; i++)
         {
             for (int j = 0; j < sizeCh; j++)
             {
-                
                 float x = x0 - sizeCh / 2 + 0.5f + i;
                 float y = y0 - sizeCh / 2 + 0.5f + j;
 
                 if (noiseValuesHeight[i * sizeCh + j] < waterLevel)
                 {
-                    cells.Add(Instantiate(Water, new Vector3(x, y, 0), Quaternion.identity, transform));
-                    cells[i * sizeCh + j].name = "Water";
+                    CreateAndSetType(CellType.Water, i, j, x, y);
                 }
                 else if (noiseValuesHeight[i * sizeCh + j] < sandLevel)
                 {
-                    cells.Add(Instantiate(Sand, new Vector3(x, y, 0), Quaternion.identity, transform));
-                    cells[i * sizeCh + j].name = "Sand";
+                    CreateAndSetType(CellType.Sand, i, j, x, y);
                 }
                 else if (noiseValuesHeight[i * sizeCh + j] < landLevel)
                 {
-                    cells.Add(Instantiate(Land, new Vector3(x, y, 0), Quaternion.identity, transform));
-                    cells[i * sizeCh + j].name = "Land";
+                    CreateAndSetType(CellType.Land, i, j, x, y);
                 }   
                 else
                 {
-                    cells.Add(Instantiate(Mountain, new Vector3(x, y, 0), Quaternion.identity, transform));
-                    cells[i * sizeCh + j].name = "Mountain";
+                    CreateAndSetType(CellType.Mountain, i, j, x, y);
                 }
-                CellScipt celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
-                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
-                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
             }
         }
+    }
+
+    private void CreateAndSetType(CellType cellType, int i, int j, float x, float y)
+    {
+        switch (cellType)
+        {
+            case CellType.Water:
+                cells.Add(Instantiate(Water, new Vector3(x, y, 0), Quaternion.identity, transform));
+                CellScipt celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
+                celSc.cellType = cellType;
+                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
+                break;
+            case CellType.Sand:
+                cells.Add(Instantiate(Sand, new Vector3(x, y, 0), Quaternion.identity, transform));
+                celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
+                celSc.cellType = cellType;
+                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
+                break;
+            case CellType.Land:
+                cells.Add(Instantiate(Land, new Vector3(x, y, 0), Quaternion.identity, transform));
+                celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
+                celSc.cellType = cellType;
+                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
+                break;
+            case CellType.Mountain:
+                cells.Add(Instantiate(Mountain, new Vector3(x, y, 0), Quaternion.identity, transform));
+                celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
+                celSc.cellType = cellType;
+                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
+                break;
+
+        }
+
+
     }
 
     public void SetNodeVectors()
@@ -207,21 +246,17 @@ public class ChunkScript : MonoBehaviour
         return false;
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && collision.GetType() == typeof(CircleCollider2D))
-        {
-            genMap.LCDChunks(x0, y0);
-        }
 
     }
-    private bool IsPlayer(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        return collision.tag == "Player" && collision.GetType() == typeof(BoxCollider2D);
+
     }
 }

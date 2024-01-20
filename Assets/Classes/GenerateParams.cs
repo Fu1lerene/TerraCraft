@@ -10,9 +10,9 @@ namespace Assets.Classes
     static class GenerateParams
     {
         public static int SizeChunk = 32;
-        public static int LoadingDistance = 1;
+        public static int LoadingDistance = 2;
         public static int CountOctaves = 3;
-        public static int StartCountChunks = 1;
+        public static int StartCountChunks = 2;
 
         public static float DensityForest = - 0.4f;
         public static float DensityGrass = 0.01f;
@@ -20,6 +20,12 @@ namespace Assets.Classes
         public static float SandLevel = 0.35f;
         public static float LandLevel = 0.8f;
 
-        public static string WorldType = "default"; // default, island, line, circles
+        public enum WorldType
+        {
+            Default,
+            Island,
+            Line,
+            Circles
+        }
     }
 }

@@ -9,7 +9,6 @@ public class GenerateAnimals : MonoBehaviour
 {
     public GameObject Sheep;
     public GameObject Map;
-    public GameObject Land;
 
     public List<GameObject> sheeps = new List<GameObject>();
     private int sizeCh = GenerateParams.SizeChunk;
@@ -26,11 +25,10 @@ public class GenerateAnimals : MonoBehaviour
     {
         cellSc = cell.GetComponent<CellScipt>();
         float rnd = Random.value;
-        if ((cellSc.type == "Land") && (sheepChance > rnd)) // Спавн овцы
+        if ((cellSc.cellType == ChunkScript.CellType.Land) && (sheepChance > rnd)) // Спавн овцы
         {
             Vector3 pos = cell.transform.position;
             sheeps.Add(Instantiate(Sheep, pos, Quaternion.identity, transform));
-
         }
     }
 

@@ -10,31 +10,28 @@ using UnityEngine;
 
 public class CellScipt : MonoBehaviour
 {
+    public int ID;
+    private static int _id;
     public float valueHeight;
     public float valueVegetation;
+
     public GameObject Tree;
     public GameObject Grass;
-    public GameObject Sheep;
-    //public GameObject thisCell;
 
-    public string type;
-    public GameObject Vegetation;
-
+    private GameObject Vegetation;
     private float densForest = GenerateParams.DensityForest;
     private float densGrass = GenerateParams.DensityGrass;
 
     private GenerateAnimals genAn;
-    private ChunkScript chSc;
-    private GenerateMap genMap;
-    private GameObject ent;
+    public ChunkScript.CellType cellType;
+
+
 
     void Start()
     {
-        chSc = GetComponentInParent<ChunkScript>(); //
-        genMap = chSc.GetComponentInParent<GenerateMap>(); //
-        genAn = genMap.genAn; // конструкци€ из этих трЄх строк сомнительна€ дл€ получени€ genAn.
-
-        type = name; // установка типа текущей €чейке (так удобнее потом делать проверки, какой у €чейки тип
+        ID = ++_id;
+        Debug.Log(ID);
+        genAn = GetComponentInParent<GenerateMap>().Entities.GetComponent<GenerateAnimals>(); // получение genAn через genMap
         CreateTree();
         genAn.SpawnAnimalOnCell(gameObject);
         RandomColoring();
@@ -47,7 +44,7 @@ public class CellScipt : MonoBehaviour
 
     private void CreateTree()
     {
-        if (type == "Land")
+        if (cellType == ChunkScript.CellType.Land)
         {
             float rnd1 = Random.value;
             float rnd2 = Random.value;
@@ -67,27 +64,27 @@ public class CellScipt : MonoBehaviour
     private void RandomizeTree()
     {
         float rnd1 = Random.value * 0.3f - 0.15f;
-        float rnd2 = Random.value * 0.3f - 0.15f;
+        float rnd2 = Random.value * 0.2f - 0.1f;
 
         Vegetation.transform.localScale = new Vector3(1f + rnd1, 1f + rnd1, 1f + rnd1);
         SpriteRenderer spr = Vegetation.GetComponent<SpriteRenderer>();
-        spr.color = new Color(0.15f, 0.4f + rnd2, 0.18f, 1f);
+        spr.color = new Color(0.2f, 0.45f + rnd2, 0.23f, 1f);
     }
 
     private void RandomColoring()
     {
         float clr = Random.value * 0.2f - 0.2f;
         SpriteRenderer spr = GetComponent<SpriteRenderer>();
-        if (type == "Water")
+        if (cellType == ChunkScript.CellType.Water)
         {
             float deep = valueHeight * 0.8f;
             spr.color = new Color(0.25f + deep, 0.45f + clr + deep, 0.87f + deep, 1);
         }
-        else if (type == "Sand")
+        else if (cellType == ChunkScript.CellType.Sand)
         {
             spr.color = new Color(0.93f, 0.89f, 0.42f + clr, 1);
         }
-        else if (type == "Land")
+        else if (cellType == ChunkScript.CellType.Land)
         {
             float deep = valueHeight * 0.2f - 0.15f;
             spr.color = new Color(0.32f + deep, 0.84f + clr + deep, 0.34f + deep, 1);

@@ -17,7 +17,7 @@ public class CameraMovement : MonoBehaviour
 
     void Start()
     {
-        //player = entities.GetComponent<CreatePlayer>().player;
+
     }
 
     void Update()

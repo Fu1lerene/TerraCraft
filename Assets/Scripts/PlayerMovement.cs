@@ -36,8 +36,11 @@ public class PlayerMovement : MonoBehaviour
 
         FlipSprite();
         Movement();
-
-
+    }
+    private void FixedUpdate()
+    {
+        movement = GetMovement(multSpeed);
+        transform.Translate(movement); /// Перемещение
     }
 
     private void FlipSprite()
@@ -47,17 +50,25 @@ public class PlayerMovement : MonoBehaviour
         //if (mousePos.x > 550 && mousePos.x <= 1100)
         //    sr.flipX = false;
 
+
         /// Поворот спрайта
         if (moveHorizontal > 0)
+        {
             sr.flipX = false;
+
+        }
+            
         if (moveHorizontal < 0)
+        {
             sr.flipX = true;
+
+        }     
     }
 
     private void Movement()
     {
         /// Движение с ускорением
-        movement = GetMovement(multSpeed);
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && plSt.Stamina.Value > plSt.Stamina.MaxValue * 0.05 && movement != new Vector3(0, 0, 0))
             isRunning = true;
         if (Input.GetKeyUp(KeyCode.LeftShift))
@@ -93,8 +104,6 @@ public class PlayerMovement : MonoBehaviour
         {
             movement /= Mathf.Sqrt(2);
         }
-
-        transform.Translate(movement); /// Перемещение
     }
 
     private Vector3 GetMovement(float multSpeed)

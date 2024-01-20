@@ -13,7 +13,7 @@ namespace Assets.Classes
         private int countOct = GenerateParams.CountOctaves;
         private int countNodes;
         private int sizeCh = GenerateParams.SizeChunk;
-        private string worldType = GenerateParams.WorldType;
+        //private GenerateParams.WorldType worldType = GenerateParams.WorldType.Default;
 
         private Vector2[][] nodesGrid;
 

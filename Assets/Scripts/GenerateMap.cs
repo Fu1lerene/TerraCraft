@@ -1,6 +1,5 @@
 using Assets;
 using Assets.Classes;
-//using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,7 +10,6 @@ using TreeEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
-using System.Threading;
 using UnityEditor.Search;
 
 public class GenerateMap : MonoBehaviour
@@ -27,8 +25,13 @@ public class GenerateMap : MonoBehaviour
     private int distLoad = GenerateParams.LoadingDistance;
     private int startCountChunks = GenerateParams.StartCountChunks;
     private int sizeCh = GenerateParams.SizeChunk;
+    public Vector2 prevChunk;
+    public Vector2 currChunk;
+    private GameObject player;
+    public float xpl, ypl;
 
-    public GenerateAnimals genAn;
+    private GenerateAnimals genAn;
+
 
     private void Awake()
     {
@@ -37,16 +40,29 @@ public class GenerateMap : MonoBehaviour
         {
             for (int j = 0; j < 2 * startCountChunks + 1; j++)
             {
-                
                 map.Add(Instantiate(ChunkPref, new Vector3(i * sizeCh, j * sizeCh, 0), Quaternion.identity, transform)); /// Сдвиг +0,5f
+
             }
         }
-        
     }
 
     void Start()
     {
-
+        player = Entities.GetComponent<CreatePlayer>().player;
+        xpl = Mathf.Floor((player.transform.position.x + sizeCh / 2.0f)/sizeCh) * sizeCh;
+        ypl = Mathf.Floor((player.transform.position.y + sizeCh / 2.0f) / sizeCh) * sizeCh;
+        currChunk = new Vector2(xpl, ypl);
+    }
+    private void Update()
+    {
+        prevChunk = currChunk;
+        xpl = Mathf.Floor((player.transform.position.x + sizeCh / 2.0f) / sizeCh) * sizeCh;
+        ypl = Mathf.Floor((player.transform.position.y + sizeCh / 2.0f) / sizeCh) * sizeCh;
+        currChunk = new Vector2(xpl, ypl);
+        if (currChunk != prevChunk)
+        {
+            LCDChunks(currChunk.x, currChunk.y);
+        }
     }
 
     public void LCDChunks(float x0, float y0)
@@ -103,6 +119,7 @@ public class GenerateMap : MonoBehaviour
         x = x0 - distLoad * sizeCh + i * sizeCh;
         y = y0 - distLoad * sizeCh + j * sizeCh;
         existFlag = false;
+
         foreach (var chunk in map)
         {
             if (chunk.transform.position.x == x && chunk.transform.position.y == y)
@@ -118,8 +135,5 @@ public class GenerateMap : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
 
-    }
 }
