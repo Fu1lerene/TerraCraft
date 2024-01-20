@@ -143,4 +143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b51345c3a7df3e43a48a5756e89fcc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 0
+  valueHeight: 0
+  valueVegetation: 0
+  Tree: {fileID: 1418385025366777001, guid: 71bdef699b487ad43a145935a82a6c92, type: 3}
+  Grass: {fileID: 4326004699523164443, guid: 0f90e1bad9f75a64bb195599e3d31eaf, type: 3}
+  Sheep: {fileID: 3567856491832164473, guid: a5eb38f26fbe6c140a92f13d52d6bf19, type: 3}
+  type: 
+  Vegetation: {fileID: 0}

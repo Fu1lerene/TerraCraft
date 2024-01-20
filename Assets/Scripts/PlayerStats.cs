@@ -7,7 +7,7 @@ public class PlayerStats : MonoBehaviour
 {
     public float Hp = 100;
     public float Speed = 2;
-    public float Damage = 50;
+    public float Damage = 10;
     public Stamina Stamina;
 
     private float maxValStam = 100;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using Assets.Classes;
+using UnityEditor;
 
 
 public class ChunkScript : MonoBehaviour
@@ -11,13 +12,16 @@ public class ChunkScript : MonoBehaviour
     public GameObject Water;
     public GameObject Sand;
     public GameObject Mountain;
-    public GameObject Tree;
+    public GameObject Sheep;
+    
 
     public Vector2[][] NodeVectorsHeight = new Vector2[GenerateParams.CountOctaves][];
+    public Vector2[][] NodeVectorsVegetation = new Vector2[GenerateParams.CountOctaves][];
     public int ID;
     private static int _id;
     private int sizeCh = GenerateParams.SizeChunk;
     private GenerateMap genMap;
+    private GenerateAnimals genAn;
     private float x0;
     private float y0;
     private int countOct = GenerateParams.CountOctaves;
@@ -26,9 +30,12 @@ public class ChunkScript : MonoBehaviour
     [SerializeField]
     public List<GameObject> cells = new List<GameObject>();
     public List<float> noiseValuesHeight;
+    public List<float> noiseValuesVegetation;
+    //public List<GameObject> sheeps;
     private float waterLevel = GenerateParams.WaterLevel;
     private float sandLevel = GenerateParams.SandLevel;
     private float landLevel = GenerateParams.LandLevel;
+    public bool startFlag = true;
 
     void Start()
     {
@@ -39,12 +46,13 @@ public class ChunkScript : MonoBehaviour
         {
             int countAllNodes = (int)Mathf.Pow(Mathf.Pow(2, k) + 1, 2);
             NodeVectorsHeight[k] = new Vector2[countAllNodes];
+            NodeVectorsVegetation[k] = new Vector2[countAllNodes];
         }
         genMap = GetComponentInParent<GenerateMap>();
-
-        Invoke("GenerateCellsWithNoise", 0.01f); // костыль #1
-
+        //Invoke("GenerateCellsWithNoise", 0.01f); // костыль #1 ОООО ДААААА, МЫ ОТ НЕГО ИЗБАВИЛИСЬ!!!
+        GenerateCellsWithNoise();
     }
+
     private void GenerateCellsWithNoise()
     {
         SetNodeVectors();
@@ -53,32 +61,50 @@ public class ChunkScript : MonoBehaviour
 
     private void CreateCellsOnTheField()
     {
-        MyPerlin perlin = new MyPerlin(NodeVectorsHeight);
-        noiseValuesHeight = perlin.GetNoiseValues(gameObject);
+        MyPerlin perlinHeight = new MyPerlin(NodeVectorsHeight); // шум для высот
+        MyPerlin perlinVegetation = new MyPerlin(NodeVectorsVegetation); // шум для деревьев
+        noiseValuesHeight = perlinHeight.GetNoiseValues(gameObject);
+        noiseValuesVegetation = perlinVegetation.GetNoiseValues(gameObject);
         for (int i = 0; i < sizeCh; i++)
         {
             for (int j = 0; j < sizeCh; j++)
             {
+                
                 float x = x0 - sizeCh / 2 + 0.5f + i;
                 float y = y0 - sizeCh / 2 + 0.5f + j;
+
                 if (noiseValuesHeight[i * sizeCh + j] < waterLevel)
+                {
                     cells.Add(Instantiate(Water, new Vector3(x, y, 0), Quaternion.identity, transform));
+                    cells[i * sizeCh + j].name = "Water";
+                }
                 else if (noiseValuesHeight[i * sizeCh + j] < sandLevel)
+                {
                     cells.Add(Instantiate(Sand, new Vector3(x, y, 0), Quaternion.identity, transform));
+                    cells[i * sizeCh + j].name = "Sand";
+                }
                 else if (noiseValuesHeight[i * sizeCh + j] < landLevel)
+                {
                     cells.Add(Instantiate(Land, new Vector3(x, y, 0), Quaternion.identity, transform));
-                else cells.Add(Instantiate(Mountain, new Vector3(x, y, 0), Quaternion.identity, transform));
-                
+                    cells[i * sizeCh + j].name = "Land";
+                }   
+                else
+                {
+                    cells.Add(Instantiate(Mountain, new Vector3(x, y, 0), Quaternion.identity, transform));
+                    cells[i * sizeCh + j].name = "Mountain";
+                }
                 CellScipt celSc = cells[i * sizeCh + j].GetComponent<CellScipt>();
-                celSc.value = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueHeight = noiseValuesHeight[i * sizeCh + j];
+                celSc.valueVegetation = noiseValuesVegetation[i * sizeCh + j];
             }
         }
     }
 
     public void SetNodeVectors()
     {
-        foreach (var chunk in genMap.map)
+        for (int i = 0; i < ID; i++)
         {
+            GameObject chunk = genMap.map[i];
             if (IsFindedChunk(chunk, "left"))
             {
                 SetNodeVectorsFromOtherChunk(chunk, "left");
@@ -110,6 +136,10 @@ public class ChunkScript : MonoBehaviour
                 {
                     NodeVectorsHeight[k][i] = GetRandomVector();
                 }
+                if (NodeVectorsVegetation[k][i] == new Vector2())
+                {
+                    NodeVectorsVegetation[k][i] = GetRandomVector();
+                }
             }
         }
     }
@@ -120,6 +150,7 @@ public class ChunkScript : MonoBehaviour
         float x2 = (float)(2 * Random.value - 1);
         return new Vector2(x1 / Mathf.Sqrt(x1 * x1 + x2 * x2), x2 / Mathf.Sqrt(x1 * x1 + x2 * x2));
     }
+
     private void SetNodeVectorsFromOtherChunk(GameObject otherChunk, string where)
     {
         ChunkScript chSc = otherChunk.GetComponent<ChunkScript>();
@@ -134,16 +165,20 @@ public class ChunkScript : MonoBehaviour
                 switch (where)
                 {
                     case "left":
-                        NodeVectorsHeight[k][i] = chSc.NodeVectorsHeight[k][index]; 
+                        NodeVectorsHeight[k][i] = chSc.NodeVectorsHeight[k][index];
+                        NodeVectorsVegetation[k][i] = chSc.NodeVectorsVegetation[k][index];
                         break;
                     case "right":
                         NodeVectorsHeight[k][index] = chSc.NodeVectorsHeight[k][i];
+                        NodeVectorsVegetation[k][index] = chSc.NodeVectorsVegetation[k][i];
                         break;
                     case "top":
                         NodeVectorsHeight[k][indextb1] = chSc.NodeVectorsHeight[k][indextb2];
+                        NodeVectorsVegetation[k][indextb1] = chSc.NodeVectorsVegetation[k][indextb2];
                         break;
                     case "bottom":
                         NodeVectorsHeight[k][indextb2] = chSc.NodeVectorsHeight[k][indextb1];
+                        NodeVectorsVegetation[k][indextb2] = chSc.NodeVectorsVegetation[k][indextb1];
                         break;
 
                 }

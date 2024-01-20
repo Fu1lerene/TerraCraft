@@ -6,14 +6,18 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
 using TreeEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Threading;
+using UnityEditor.Search;
 
 public class GenerateMap : MonoBehaviour
 {
     public GameObject ChunkPref;
+    public GameObject Entities;
 
     public List<GameObject> map = new List<GameObject>();
     public List<GameObject> newChunks;
@@ -24,15 +28,20 @@ public class GenerateMap : MonoBehaviour
     private int startCountChunks = GenerateParams.StartCountChunks;
     private int sizeCh = GenerateParams.SizeChunk;
 
+    public GenerateAnimals genAn;
+
     private void Awake()
     {
+        genAn = Entities.GetComponent<GenerateAnimals>();
         for (int i = 0; i < 2 * startCountChunks + 1; i++)
         {
             for (int j = 0; j < 2 * startCountChunks + 1; j++)
             {
+                
                 map.Add(Instantiate(ChunkPref, new Vector3(i * sizeCh, j * sizeCh, 0), Quaternion.identity, transform)); /// Сдвиг +0,5f
             }
         }
+        
     }
 
     void Start()
@@ -56,6 +65,10 @@ public class GenerateMap : MonoBehaviour
         }
         DeactivateChunks(x0, y0);
         map.AddRange(newChunks);
+
+        genAn.ToggleAnimalsInChunks(loadingChunks, true); // включение животных на загружаемых чанках
+        genAn.ToggleAnimalsInChunks(oldChunks, false); // выключение животных на деактивируемых чанках
+        // животные не привязаны к чанкам, их включение и выключение происходит после сравнения координат животного с координатами чанка
     }
 
     private void DeactivateChunks(float x0, float y0)
@@ -70,7 +83,6 @@ public class GenerateMap : MonoBehaviour
             {
                 if (!oldChunks.Contains(chunk))
                 {
-
                     chunk.SetActive(false);
                     oldChunks.Add(chunk);
                 }
@@ -105,8 +117,6 @@ public class GenerateMap : MonoBehaviour
             }
         }
     }
-
-
 
     private void Update()
     {

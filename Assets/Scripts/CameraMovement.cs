@@ -17,11 +17,12 @@ public class CameraMovement : MonoBehaviour
 
     void Start()
     {
-        player = entities.GetComponent<CreatePlayer>().player;
+        //player = entities.GetComponent<CreatePlayer>().player;
     }
 
     void Update()
     {
+        player = entities.GetComponent<CreatePlayer>().player;
         cam.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -10);
         float scroll = Input.GetAxis("Mouse ScrollWheel");
 

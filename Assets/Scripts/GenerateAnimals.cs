@@ -1,7 +1,9 @@
 using Assets.Classes;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Schema;
 using UnityEngine;
+using System.Threading;
 
 public class GenerateAnimals : MonoBehaviour
 {
@@ -11,6 +13,8 @@ public class GenerateAnimals : MonoBehaviour
 
     public List<GameObject> sheeps = new List<GameObject>();
     private int sizeCh = GenerateParams.SizeChunk;
+    private float sheepChance = 0.005f; // вероятность спавна овцы на траве
+    private CellScipt cellSc;
 
 
     void Start()
@@ -18,44 +22,40 @@ public class GenerateAnimals : MonoBehaviour
 
     }
 
-    //public void SpawnAnimals(List<Chunk> chunks)
-    //{
-    //    foreach (var chunk in chunks)
-    //    {
-    //        int count = 0;
-    //        foreach (var cell in chunk.Cells) /// Количество допустимых клеток
-    //        {
-    //            if (cell.Type == Land)
-    //                count++;
-    //        }
+    public void SpawnAnimalOnCell(GameObject cell)
+    {
+        cellSc = cell.GetComponent<CellScipt>();
+        float rnd = Random.value;
+        if ((cellSc.type == "Land") && (sheepChance > rnd)) // Спавн овцы
+        {
+            Vector3 pos = cell.transform.position;
+            sheeps.Add(Instantiate(Sheep, pos, Quaternion.identity, transform));
 
-    //        float dolya = (float)count / (sizeCh * sizeCh);
+        }
+    }
 
-    //        for (int i = 0; i < 5 * dolya; i++)
-    //        {
-    //            float x = Mathf.Floor(chunk.X * sizeCh + Random.Range(0, sizeCh - 1));
-    //            float y = Mathf.Floor(chunk.Y * sizeCh + Random.Range(0, sizeCh - 1));
-    //            foreach (var cell in chunk.Cells)
-    //            {
-    //                if (cell.X == x && cell.Y == y)
-    //                {
-    //                    if (cell.Type == Land)
-    //                    {
-    //                        sheeps.Add(Instantiate(Sheep, new Vector3(x, y, 0), Quaternion.identity, transform));
-    //                        break;
-    //                    }
-    //                    else
-    //                    {
-    //                        i--;
-    //                        break;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
+    public void ToggleAnimalsInChunks(List<GameObject> chunks, bool status) // включение и выключение животных в чанке
+    {
+        foreach (var chunk in chunks)
+        {
+            float xCh = chunk.transform.position.x;
+            float yCh = chunk.transform.position.y;
+            foreach (var sheep in sheeps)
+            {
+                float xSh = sheep.transform.position.x;
+                float ySh = sheep.transform.position.y;
+                if ((xSh < xCh + sizeCh / 2) && (xSh > xCh - sizeCh / 2) &&
+                   (ySh < yCh + sizeCh / 2) && (ySh > yCh - sizeCh / 2))
+                {
+                    sheep.SetActive(status);
+                }
+            }
+        }
+
+    } 
 
     void Update()
     {
+
     }
 }
